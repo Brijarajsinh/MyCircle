@@ -1,0 +1,49 @@
+<div class="page page-center">
+    <div class="container container-tight py-4">
+        <div class="card card-md">
+            <div class="card-body">
+                <h2 class="h2 text-center mb-4">Register your new account</h2>
+                <form id="RegistrationForm" action="/registration" method="post">
+                    <h2 class="card-title text-center mb-4">Create new account</h2><br>
+                    <div class="mb-3">
+                        <label class="form-label">First Name:-</label><b>
+                            <input type="text" class="form-control" placeholder="Enter Your First name" name="fname">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name:-</label>
+                        <input type="text" class="form-control" placeholder="Enter Your Last name" name="lname">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email address:-</label>
+                        <input type="email" class="form-control" placeholder="Enter email" name="email" id="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gender:-</label>
+                        <input type="radio" id="male" name="gender" value="male">
+                        <label for="male">Male</label><br>
+                        <input type="radio" id="female" name="gender" value="female">
+                        <label for="female">Female</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password:-</label>
+                        <input type="password" class="form-control" placeholder="Enter Password" name="pswd" id="pswd"
+                            minlength="8">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password:-</label>
+                        <input type="password" class="form-control" placeholder="Confirm Password" name="cpswd"
+                            id="cpswd" minlength="8">
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" id="btn-submit" class="btn btn-primary w-100" name="register">Create new
+                            account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center text-muted mt-3">
+            Already have account? <a href="/login" tabindex="-1">Log in</a>
+        </div>
+    </div>
+</div>
+<script src="/javascripts/user/registration.js"></script>

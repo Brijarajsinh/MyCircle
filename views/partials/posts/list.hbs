@@ -1,0 +1,80 @@
+{{#each posts}}
+<div class="container card border-success mb-3">
+    <div class="row card-header bg-transparent text-success">
+        <div class="col-2 avatar avatar-m"
+            style="background-image: url(/images/user_images/{{user.profile}}); border-radius: 50%; text-align: start;">
+        </div>
+        <div class="col-5 d-block">
+            <div>{{title}}</div>
+            <div class="text-primary">Post by {{user.fname}} {{user.lname}}</div>
+        </div>
+        {{#if @root.user._id }}
+        <div class="col">
+            <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
+                data-bs-auto-close="outside" role="button" aria-expanded="false">
+                <span class="nav-link-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-three-dots" viewBox="0 0 16 16" style="margin-top: -3px;margin-left: 237px;">
+                        <path
+                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                    </svg>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <div class="dropdown-menu-columns">
+                    <div class="dropdown-menu-column">
+                        {{#compare @root.user._id "==" user_id}}
+
+                        {{#if ../archived}}
+                        <a class="dropdown-item" href="#" data-postid={{_id}} id="archive-btn">
+                            Remove From Archive
+                        </a>
+                        {{else}}
+                        <a class="dropdown-item edit-btnn" href="javascript:void(0)" data-postid={{_id}} id="edit-btn">
+                            Edit Post
+                        </a>
+                        <a class="dropdown-item" href="#" data-postid={{_id}} id="archive-btn">
+                            Archive Post
+                        </a>
+                        {{/if}}
+                        {{/compare}}
+                        {{#compare @root.user._id "!=" user_id}}
+                        <a class="dropdown-item save-btn" href="#" data-postid={{_id}} id="save-btn">
+                            {{#if saved}}Unsave{{else}}Save{{/if}}
+                        </a>
+                        {{/compare}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="text-center">
+                    {{#if postImage}}
+                    <img src="/images/posts/{{postImage}}" />
+                    {{else}}
+                    <img src="/images/default_post.jpeg" />
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-md">
+                <p class="card-text">{{description}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer bg-transparent text-success">Posted on {{dateConvert createdAt}}</div>
+</div>
+{{/each}}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {{#each page}}
+        <li class="page-item"><a class="page-link pagewise" href="#" data-page={{this}}>{{this}}</a></li>
+        {{/each}}
+    </ul>
+</nav>
+  {{> posts/edit}}
+  {{> posts/archive}}
+  {{> posts/save}}

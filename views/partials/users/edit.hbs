@@ -1,0 +1,41 @@
+<div class="modal fade" id="editModal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Update user Details</h4>
+      </div>
+      <div class="modal-body">
+        <form id="EditForm" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Profile Picture:-</label><b>
+              <input type="file" class="form-control" name="files" id="file">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">First Name:-</label><b>
+              <input type="text" class="form-control" name="fname" id="fname">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Last Name:-</label>
+            <input type="text" class="form-control" name="lname" id="lname">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email address:-</label>
+            <input type="email" class="form-control" name="email" id="email" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender:-</label>
+            <input type="radio" id="male" name="gender" class="gender" value="male">
+            <label for="male">Male</label><br>
+            <input type="radio" id="female" name="gender" class="gender" value="female">
+            <label for="female">Female</label>
+          </div>
+          <div class="form-footer">
+            <input type="submit" class="submit-btn" value="Update">
+            <button type="button" class="closeUserEdit" data-dismiss="modal">CLOSE</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

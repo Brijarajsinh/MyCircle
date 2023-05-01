@@ -1,0 +1,34 @@
+<div class="modal fade" id="editPostModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Post</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editPostForm" enctype="multipart/form-data">
+                    {{!-- method="post" action="/users/" --}}
+                    <div class="mb-3">
+                        <label class="form-label">Title</label><b>
+                            <input type="text" class="form-control title_old" placeholder="Title" name="title"
+                                id="title_old" value="">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="description_old" id="description_old" name="description" rows="6"
+                            cols="50"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image</label><b>
+                            <input type="file" class="form-control" name="image_new" id="image_new">
+                    </div>
+                    <div class="form-footer">
+                        <input type="submit" class="submit-btn" value="EDIT">
+                        <button type="button" class="closeEditPostModal" data-dismiss="modal">CLOSE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/javascripts/posts/edit.js"></script>
