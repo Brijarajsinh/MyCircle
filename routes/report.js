@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 const UserModel = require('../schema/userSchema');
 
-
 router.get('/', async function (req, res, next) {
   let find = {}
   let page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
@@ -82,16 +81,27 @@ router.get('/', async function (req, res, next) {
   let totalUsers = await UserModel.countDocuments(
     find
   );
-  let pageCount = Math.ceil(totalUsers / 3);
+  let pageCount = Math.ceil(totalUsers / limit);
   let page = [];
   for (let i = 1; i <= pageCount; i++) {
     page.push(i);
   }
-  if (req.xhr)  {
-    res.render("partials/report", { title: 'Report Page', users: user, layout: 'blank', page: page });
+
+  if (req.xhr) {
+    res.render("partials/report", {
+      title: 'Report Page',
+      users: user,
+      layout: 'blank',
+      page: page
+      
+    });
   }
   else {
-    res.render('report', { title: 'Report Page', users: user, page: page });
+    res.render('report', {
+      title: 'Report Page',
+      users: user,
+      page: page
+    });
   }
 });
 module.exports = router;

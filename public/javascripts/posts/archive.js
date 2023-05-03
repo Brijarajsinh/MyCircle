@@ -1,6 +1,5 @@
 $(document).ready(function () {
     $(document).unbind().on('click', '#archive-btn', function () {
-        // alert("clicked");   
         $.ajax({
             type: "delete",
             url: "/posts",

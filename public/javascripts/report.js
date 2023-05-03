@@ -1,6 +1,5 @@
 $(document).ready(function () {
     $(".reported").hide();
-
     function getURL() {
         let url = '/report?';
         let search = $(".search_user").val();
@@ -23,7 +22,6 @@ $(document).ready(function () {
             }
         })
     });
-    
     $(document).unbind('click').on('click','.userWise', function () {
         let page = $(this).data("page");
         let url = getURL();

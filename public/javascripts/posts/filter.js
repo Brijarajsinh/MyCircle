@@ -4,7 +4,11 @@ $(document).ready(function () {
         let filter = $(".filter").val();
         let sort = $(".sort").val();
         let search = $(".search").val();
-        if (filter) {
+
+        if (filter == "arch") {
+            url += `arch=1&`
+        }
+        else {
             url += `filter=${filter}&`
         }
         if (sort) {
@@ -15,29 +19,27 @@ $(document).ready(function () {
         }
         return url;
     }
-    $(".pagewise").unbind('click').on('click',function () {
+    $(".pagewise").unbind().on("click", function () {
         let page = $(this).data("page");
         let url = getURL();
         url += `page=${page}`;
-        alert(url);
         $.ajax({
             type: "get",
             url: url,
             success: function (res) {
-                // console.log(res);
                 $("#listPost").html(res);
             },
             error: function (err) {
                 console.log(err.toString());
             }
-        })
+        });
     });
+
     $(".search").unbind().on('input', function () {
         $.ajax({
             type: "get",
             url: getURL(),
             success: function (res) {
-                console.log(res);
                 $("#listPost").html(res);
             },
             error: function (err) {
@@ -51,8 +53,6 @@ $(document).ready(function () {
             type: "get",
             url: getURL(),
             success: function (res) {
-                console.log($("#listPost").length);
-                // console.log(res);
                 $("#listPost").html(res);
             },
             error: function (err) {
@@ -61,31 +61,10 @@ $(document).ready(function () {
         })
     });
     $(".sort").unbind('change').on('change', function () {
-        // alert(getURL());
-
         $.ajax({
             type: "get",
             url: getURL(),
             success: function (res) {
-                console.log(res);
-                $("#listPost").html(res);
-            },
-            error: function (err) {
-                console.log(err.toString());
-            }
-        })
-    });
-    $("#archivedPost").unbind('click').on('click', function () {
-        let arch = $(".arch").data("userid");
-        let url = '?';
-        if (arch) {
-            url += `arch=${arch}&`
-        }
-        $.ajax({
-            type: "get",
-            url: url,
-            success: function (res) {
-                console.log(res);
                 $("#listPost").html(res);
             },
             error: function (err) {

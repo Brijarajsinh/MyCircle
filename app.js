@@ -11,6 +11,12 @@ var bodyParser = require('body-parser');
 const moment = require('moment');
 const helpers = require('handlebars-helpers')();
 
+const userModel = require('./schema/userSchema');
+const PostModel = require('./schema/postSchema');
+const savedPostModel = require('./schema/savedPost');
+const statisticsModel = require('./schema/statistics');
+
+
 //Requiring Flash
 const flash = require('connect-flash');
 // global.md5 = require('md5');
@@ -57,7 +63,7 @@ auth.login(app);
 app.use(flash());
 
 app.use((req, res, next) => {
-  if(req.user){
+  if (req.user) {
     res.locals.user = req.user;
   }
   let error = req.flash("error");
@@ -78,15 +84,43 @@ app.use((req, res, next) => {
 });
 app.use('/', require('./routes/index'));
 app.use(auth.commonMiddleware);
-app.use('/posts',require('./routes/posts'));
+app.use('/posts', require('./routes/posts'));
 
-app.use(function (req, res, next) {
-  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  next();
-});
-app.use('/report',require('./routes/report'));
+// app.use(function (req, res, next) {
+//   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+//   next();
+// });
+app.use('/report', require('./routes/report'));
 // app.use('/save',require('./routes/savedPost'));
 app.use('/users', require('./routes/users'));
+
+var cron = require('node-cron');
+
+cron.schedule('*/1 * * * * *', async function (req, res) {
+  const totalUser = await userModel.find({});
+  for (const iterator of totalUser) {
+    const totalCreatedPost = await PostModel.countDocuments({
+      user_id: iterator._id,
+      isArchived: false
+    }
+    );
+    const totalSavedPost = await savedPostModel.countDocuments({
+      userID: iterator._id
+    });
+    const totalSavedPostOthers = await savedPostModel.countDocuments({
+      createdBy: {
+        $eq: iterator._id
+      }
+    });
+    const data = {
+      user_id: iterator._id,
+      totalCreatedPost: totalCreatedPost,
+      totalSavedPost: totalSavedPost,
+      savedPost: totalSavedPostOthers
+    }
+    await statisticsModel.updateOne({ user_id: iterator._id }, { $set: data }, { upsert: true })
+  }
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

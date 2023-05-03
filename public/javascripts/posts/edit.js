@@ -4,7 +4,6 @@ $(document).ready(function () {
         $("#editPostModal").modal('toggle');
     });
     $(".edit-btnn").bind('click').on("click", function () {
-    // $(document).off('click','.edit-btnn').on('click','.edit-btnn',function(){
         currentPostId = $(this).data("postid");
         $.ajax({
             type: "post",
@@ -14,12 +13,9 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.type == 'success') {
-                    // alert("edit will be done");
-                    // console.log(res.data);
                     $(".title_old").val(res.data.title);
                     $(".description_old").val(res.data.description);
                     $("#editPostModal").modal('show');
-                    // $("#editPostModal").toggleClass('show');
                 }
                 else {
                     // alert("edit will be done");

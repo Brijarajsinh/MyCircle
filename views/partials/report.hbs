@@ -1,25 +1,21 @@
-<div class="modal-body row">
-    <div class="col-md-3">
+<div class="modal-body">
+    <div class="row">
         {{#each users}}
-        <div class="container card border-success mb-3">
+        <div class="container card mb-3 col-3">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-2">
-                        <div class="text-center">
-                            <div class="col-2 avatar avatar-m"
-                                style="background-image: url(/images/user_images/{{profile}});">
-                            </div>
-                        </div>
+                    <div class="col-md-2 avatar avatar-m"
+                        style="background-image: url(/images/user_images/{{profile}});">
                     </div>
                     <div class="col-md">
-                        <div class="text-primary">Fullname:- {{fullName}}</div>
-                        <div class="text-success">E-mail:- {{email}}</div>
-                        <div class="text-primary">Total Created POST:- {{postCount}}</div>
-                        <div class="text-success">Total Saved POST:- {{savedCount}}</div>
+                        <div>Full Name:- {{fullName}}</div>
+                        <div>E-mail:- {{email}}</div>
+                        <div>Total Created POST:- {{postCount}}</div>
+                        <div>Total Saved POST:- {{savedCount}}</div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer bg-transparent text-success">Registered at {{dateConvert createdAt}}</div>
+            <div class="card-footer bg-transparent">Registered at {{dateConvert createdAt}}</div>
         </div>
         {{/each}}
     </div>
@@ -30,10 +26,5 @@
             {{/each}}
         </ul>
     </nav>
-    {{!-- <div class="col-md-9">
-        <div class="container card border-success mb-3">
-            Your Second column here
-        </div>
-    </div> --}}
 </div>
 <script src="/javascripts/report.js"></script>

@@ -10,8 +10,11 @@ const savedPostSchema = new mongoose.Schema({
     userID:{
         type: mongoose.Schema.Types.ObjectId,
         required:true
+    },
+    createdBy:{
+        type: mongoose.Schema.Types.ObjectId,
+        required:true
     }
 },option);
-
 const savedPostModel = mongoose.model('savedPost', savedPostSchema);
 module.exports = savedPostModel;

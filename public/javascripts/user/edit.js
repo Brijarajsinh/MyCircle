@@ -34,11 +34,6 @@ $("#EditForm").validate({
         "lname": {
             required: true
         },
-        "email": {
-            required: true,
-            email: true,
-            remote: "check-email"
-        },
         "gender": {
             required: true
         },
@@ -52,11 +47,6 @@ $("#EditForm").validate({
         },
         "lname": {
             required: 'Last Name is Required'
-        },
-        "email": {
-            required: 'E-mail is required',
-            remote: 'E-mail is already Registered',
-            email: 'Please Enter Valid E-mail'
         },
         "gender": {
             required: 'Select Gender'

@@ -103,168 +103,7 @@ router.put('/', post.single('files'), async function (req, res, next) {
         res.send(response);
     }
 });
-
-//GET Route to show all posts in timeline page
-// router.get('/', async function (req, res, next) {
-//     try {
-//         console.log("APPLICATION STARTED.....");
-//         let page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-//         let limit = 3;
-//         let skip = (page_skip - 1) * limit
-//         //SORTING
-//         let sort = {};
-//         if (req.query.sort == 'title') {
-//             sort.title = 1
-//         }
-//         sort._id = -1;
-//         // else if (req.query.sort == 'date') {
-//         //     sort.createdAt = 1
-//         // }
-//         let find = {}
-//         if (req.user) {
-//             const userId = new mongoose.Types.ObjectId(req.user._id);
-//         }
-//         //SEARCHING Posts by 
-//         if (req.query.search) {
-//             find.$or = [
-//                 {
-//                     "title": {
-//                         $regex: req.query.search, $options: "i"
-//                     }
-//                 },
-//                 {
-//                     "description": {
-//                         $regex: req.query.search, $options: "i"
-//                     }
-//                 }
-//             ]
-//         }
-//         let archived = false;
-
-//         //ARCHIVED POSTS only
-//         if (req.query.arch) {
-//             find.isArchived = {
-//                 $eq: true
-//             }
-//             find.user_id = {
-//                 $eq: userId
-//             }
-//             archived = true;
-//         }
-//         else {
-//             find.isArchived = {
-//                 $eq: false
-//             }
-//         }
-
-//         //FILTERING
-//         if (req.query.filter == 'others') {
-//             find.user_id = {
-//                 $ne: userId
-//             }
-//         } else if (req.query.filter == 'minePosts') {
-//             find.user_id = {
-//                 $eq: userId
-//             }
-//         } else if (req.query.filter == 'saved') {
-//             let savedPostIds = await savedPostModel.distinct('postID', {
-//                 userID: userId
-//             });
-//             find._id = {
-//                 $in: savedPostIds
-//             }
-//         } else if (req.query.filter == 'allPosts') {
-//             find.isArchived = {
-//                 $eq: false
-//             }
-//         }
-//         let posts = await PostModel.aggregate([
-//             {
-//                 $match: find
-//             },
-//             {
-//                 $lookup: {
-//                     from: "users",
-//                     let: { id: "$user_id" },
-//                     pipeline: [
-//                         {
-//                             $match:
-//                             {
-//                                 $expr:
-//                                     { $eq: ["$_id", "$$id"] },
-//                             }
-//                         },
-//                         { $project: { _id: 1, fname: 1, lname: 1, profile: 1 } }
-//                     ],
-//                     as: "user"
-//                 }
-//             },
-//             {
-//                 $lookup: {
-//                     from: "savedposts",
-//                     let: { postID: "$_id" },
-//                     pipeline: [
-//                         {
-//                             $match:
-//                             {
-//                                 $expr: {
-//                                     // $and: [
-//                                     // { $eq: ["$userID", userId] },
-//                                     // {
-//                                     $eq: ["$postID", "$$postID"]
-//                                     // }
-//                                     // ]
-//                                 }
-//                             }
-//                         }
-//                     ],
-//                     as: "saved"
-//                 }
-//             },
-//             {
-//                 $project: {
-//                     _id: 1,
-//                     title: 1,
-//                     postImage: 1,
-//                     description: 1,
-//                     createdAt: 1,
-//                     user: { $arrayElemAt: ["$user", 0] },
-//                     saved: { $size: '$saved' }
-//                 }
-//             }, {
-//                 $sort: sort
-//             },
-//             { $skip: skip },
-//             { $limit: limit }
-//         ]);
-//         let totalPosts = await PostModel.countDocuments(
-//             find
-//         );
-//         let pageCount = Math.ceil(totalPosts / 3);
-//         let page = [];
-//         for (let i = 1; i <= pageCount; i++) {
-//             page.push(i);
-//         }
-//         console.log(req.user);
-//         if (req.user && req.user._id) {
-//             console.log("PARTIAL through");
-//             res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page });
-//         }
-//         else {
-//             console.log("MAIN PAGE");
-//             res.render('timeline', { title: 'Timeline', posts: posts, page: page });
-//         }
-
-
-//     } catch (error) {
-//         console.log(error);
-//         let response = {
-//             type: 'error',
-//             message: "Error Generated While SHOWING data"
-//         }
-//         res.send(response);
-//     }
-// });
+     
 //POST Route to save post by current user
 router.post('/save', async function (req, res, next) {
     try {
@@ -279,9 +118,15 @@ router.post('/save', async function (req, res, next) {
             res.send(response);
         }
         else {
+            let createdBy = await PostModel.findOne({
+                _id:postId
+            },{
+                "_id":0,"user_id":1
+            });
             let savedPostDetails = new savedPostModel({
                 "postID": postId,
                 "userID": req.user._id,
+                "createdBy":createdBy.user_id
             })
             await savedPostDetails.save();
             const response = {
@@ -292,7 +137,7 @@ router.post('/save', async function (req, res, next) {
         }
 
     } catch (error) {
-        console.log("Error generated during user  saves this post = postID", postId)
+        console.log("Error generated during user  saves this post = postID")
         console.log(error);
         let response = {
             type: 'error',

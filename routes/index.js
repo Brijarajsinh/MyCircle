@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const UserModel = require('../schema/userSchema');
 const PostModel = require('../schema/postSchema');
-
+const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
 const { default: mongoose } = require('mongoose');
 
@@ -13,17 +13,26 @@ const { rawListeners } = require('../schema/savedPost');
 /* GET home page. */
 //GET Route to render LOGIN Page
 router.get('/login', function (req, res, next) {
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  next();
+}, function (req, res, next) {
   console.log("LOGIN GET CALLED");
   res.render('login', { title: 'Login', layout: "before-login" });
 });
 
 //GET Route to render Registration Page
 router.get('/registration', function (req, res, next) {
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  next();
+}, function (req, res, next) {
   res.render('registration', { title: 'Registration', layout: "before-login" });
 });
 
 //GET Route to Logout user
-router.get('/logout', async function (req, res, next) {
+router.get('/logout', function (req, res, next) {
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  next();
+}, async function (req, res, next) {
   req.logOut();
   req.session = null;
   res.redirect("/");
@@ -39,7 +48,7 @@ router.post('/login', function (req, res, next) {
       // *** Display message without using flash option
       // re-render the login form with a message
       req.flash('error', info.message);
-      return res.redirect('/');
+      return res.redirect('/login');
     }
     req.logIn(user, async function (err) {
       if (err) {
@@ -53,10 +62,13 @@ router.post('/login', function (req, res, next) {
 });
 
 
-router.get('/', async function (req, res, next) {
+router.get('/', function (req, res, next) {
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  next();
+}, async function (req, res, next) {
   try {
     let page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-    let limit = 3;
+    let limit = 6;
     let skip = (page_skip - 1) * limit
     //SORTING
     let sort = {};
@@ -64,12 +76,13 @@ router.get('/', async function (req, res, next) {
       sort.title = 1
     }
     sort._id = -1;
-    // else if (req.query.sort == 'date') {
-    //     sort.createdAt = 1
-    // }
+
     let find = {}
     if (req.user) {
       var userId = new mongoose.Types.ObjectId(req.user._id);
+      var statistics = await statisticsModel.findOne({
+        user_id: req.user._id
+      }).lean();
     }
     //SEARCHING Posts by 
     if (req.query.search) {
@@ -155,7 +168,11 @@ router.get('/', async function (req, res, next) {
               $match:
               {
                 $expr: {
-                  $eq: ["$postID", "$$postID"]
+                  $and:
+                    [
+                      { $eq: ["$postID", "$$postID"] },
+                      { $eq: ["$userID", userId] }
+                    ]
                 }
               }
             }
@@ -170,7 +187,7 @@ router.get('/', async function (req, res, next) {
           postImage: 1,
           description: 1,
           createdAt: 1,
-          user_id:{
+          user_id: {
             $toString: "$user_id"
           },
           user: { $arrayElemAt: ["$user", 0] },
@@ -185,18 +202,18 @@ router.get('/', async function (req, res, next) {
     let totalPosts = await PostModel.countDocuments(
       find
     );
-    let pageCount = Math.ceil(totalPosts / 3);
+    let pageCount = Math.ceil(totalPosts / limit);
     let page = [];
     for (let i = 1; i <= pageCount; i++) {
       page.push(i);
     }
     if (req.xhr) {
       console.log("AJAX called");
-      res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page });
+      res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
     }
     else {
       console.log("AJAX not called");
-      res.render('timeline', { title: 'Timeline', posts: posts, page: page, archived: archived });
+      res.render('timeline', { title: 'Timeline', posts: posts, page: page, archived: archived, statistics: statistics });
     }
   } catch (error) {
     console.log(error);
@@ -212,15 +229,12 @@ router.get('/check-email', async function (req, res, next) {
   let condition = {
     email: req.query.email
   }
-  if (req.user) {
-    condition._id = {
-      $ne: req.user._id
-    }
-  }
+  // if (req.user) {
+  //   condition._id = {
+  //     $ne: req.user._id
+  //   }
+  // }
   let exist = await UserModel.countDocuments(condition);
-  console.log("------");
-  console.log(exist);
-  console.log("------");
   if (exist) return res.send(false);
   return res.send(true);
 });
@@ -229,36 +243,41 @@ router.get('/check-email', async function (req, res, next) {
 router.post('/registration', async function (req, res, next) {
   try {
     user_details = req.body;
-    var new_user = new UserModel({
-      "fname": user_details.fname,
-      "lname": user_details.lname,
-      "email": user_details.email,
-      "gender": user_details.gender,
-      "password": md5(user_details.pswd),
-      "profile": "default_user.jpg"
-    });
-
-    await new_user.save();
-    passport.authenticate('local', function (err, user, info) {
-      if (err) {
-        return next(err)
+    let exist = await UserModel.countDocuments({ email: user_details.email });
+    if (exist) {
+      let response = {
+        type: "error",
+        message: "E-mail is already registered"
       }
-      if (!user) {
-        // *** Display message without using flash option
-        // re-render the login form with a message
-        req.flash('error', info.message);
-        return res.redirect('/');
-      }
-      req.logIn(user, async function (err) {
+      return res.send(response);
+    }
+    else {
+      var new_user = new UserModel({
+        "fname": user_details.fname,
+        "lname": user_details.lname,
+        "email": user_details.email,
+        "gender": user_details.gender,
+        "password": md5(user_details.password),
+        "profile": "default_user.jpg"
+      });
+      await new_user.save();
+      req.logIn(new_user, async function (err) {
         if (err) {
           return next(err);
         }
         console.log("Log IN Successfully");
         res.locals.user = req.user;
         // user_id:req.user._id,
-        res.redirect('/');
+        res.send({
+          type: 'success'
+        });
       });
-    })(req, res, next);
+      // let response = {
+      //   type: "success"
+      // }
+      // return res.send(response);
+    }
+
   }
   catch (error) {
     console.log("Error Generated IN USER entry");
@@ -270,5 +289,4 @@ router.post('/registration', async function (req, res, next) {
     res.send(JSON.stringify(response), null, 2);
   }
 });
-
 module.exports = router;

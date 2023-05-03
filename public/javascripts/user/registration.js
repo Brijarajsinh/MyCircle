@@ -1,6 +1,5 @@
 $(document).ready(function () {
-    var value = $("#pswd").val();
-    $.validator.addMethod("strongePassword", function(value) {
+    $.validator.addMethod("strongePassword", function (value) {
         return /^[A-Za-z0-9\d=!\-@._*]*$/.test(value) && /[a-z]/.test(value) && /\d/.test(value) && /[A-Z]/.test(value);
     });
     $("#RegistrationForm").validate({
@@ -49,15 +48,40 @@ $(document).ready(function () {
             "pswd": {
                 required: 'Password is Required',
                 strongePassword: "(Use a combination of upper case letters, lower case letters, numbers, and special characters for example: !, @, &, %, +)",
-                minlength:'Password Must contain 8 characters'
+                minlength: 'Password Must contain 8 characters'
             },
             "cpswd": {
                 required: 'Confirm Your Password',
                 equalTo: 'Password Not Matched'
             },
         },
-        submitHandler: function (form) {
-            form.submit();
+        submitHandler: function () {
+            let data = {
+                fname: $("#rfname").val().trim(),
+                lname: $("#rlname").val().trim(),
+                email: $("#email").val().trim(),
+                gender: $('input[name="gender"]:checked').val(),
+                password: $("#pswd").val(),
+            }
+            $.ajax({
+                type: "post",
+                url: "/registration",
+                data: data,
+                success: function (res) {
+                    if (res.type == 'error') {
+                        alert(res.message);
+                        window.location.href('/login');
+                    }
+                    else{
+                        // res.type == 'success'
+                        alert("Registration done...");
+                        window.location.href= 'http://localhost:3000/';
+                    }
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            })
         }
     });
 });

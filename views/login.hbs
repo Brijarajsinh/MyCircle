@@ -1,12 +1,11 @@
-{{#if flash}}
-<div class="alert alert-danger">{{flash.message}}</div>
-{{/if}}
-
 <div class="page page-center">
     <div class="container container-tight py-4">
         <div class="card card-md">
             <div class="card-body">
                 <h2 class="h2 text-center mb-4">Login to your account</h2>
+                {{#if flash}}
+                <div class="alert alert-danger ">{{flash.message}}</div>
+                {{/if}} 
                 <form action="/login" id="LoginForm" method="post">
                     <div class="mb-3">
                         <label class="form-label">Email address</label>
