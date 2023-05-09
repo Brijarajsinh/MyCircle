@@ -1,7 +1,7 @@
 <header class="navbar navbar-expand-md navbar-light d-print-none">
   <div class="container-xl">
     <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-      <a href="/logout">MyCircle</a>
+      <a href="/">MyCircle</a>
     </h1>
     <div class="navbar-nav flex-row order-md-last ">
       <div class="nav-item d-none d-md-flex me-3">
@@ -19,20 +19,29 @@
               <option value="title">title</option>
             </select>
           </li>
+          <li class="nav-item dropdown">
+            <label for="order">Order to sort post:</label>
+
+            <select class="order">
+              <option value="1">ASC</option>
+              <option value="-1">DESC</option>
+            </select>
+          </li>
         </div>
       </div>
-      <div class="d-none d-md-flex">
+      {{!-- <div class="d-none d-md-flex">
         <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
           data-bs-placement="bottom">
-          
+
         </a>
         <a href="?theme=light" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
           data-bs-placement="bottom">
-          
+
         </a>
         <div class="nav-item dropdown d-none d-md-flex me-3">
-          <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
-           
+          <a href="javascript:void(0);" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1"
+            aria-label="Show notifications">
+
           </a>
           <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
             <div class="card">
@@ -44,14 +53,14 @@
                   <div class="row align-items-center">
                     <div class="col-auto"><span class="status-dot status-dot-animated bg-red d-block"></span></div>
                     <div class="col text-truncate">
-                      <a href="#" class="text-body d-block">Example 1</a>
+                      <a href="javascript:void(0);" class="text-body d-block">Example 1</a>
                       <div class="d-block text-muted text-truncate mt-n1">
                         Change deprecated html tags to text decoration classes (#29604)
                       </div>
                     </div>
                     <div class="col-auto">
-                      <a href="#" class="list-group-item-actions">
-                       
+                      <a href="javascript:void(0);" class="list-group-item-actions">
+
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24"
                           viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
                           stroke-linejoin="round">
@@ -67,14 +76,14 @@
                   <div class="row align-items-center">
                     <div class="col-auto"><span class="status-dot d-block"></span></div>
                     <div class="col text-truncate">
-                      <a href="#" class="text-body d-block">Example 2</a>
+                      <a href="javascript:void(0);" class="text-body d-block">Example 2</a>
                       <div class="d-block text-muted text-truncate mt-n1">
                         justify-content:between ⇒ justify-content:space-between (#29734)
                       </div>
                     </div>
                     <div class="col-auto">
-                      <a href="#" class="list-group-item-actions show">
-                       
+                      <a href="javascript:void(0);" class="list-group-item-actions show">
+
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-yellow" width="24" height="24"
                           viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
                           stroke-linejoin="round">
@@ -90,14 +99,14 @@
                   <div class="row align-items-center">
                     <div class="col-auto"><span class="status-dot d-block"></span></div>
                     <div class="col text-truncate">
-                      <a href="#" class="text-body d-block">Example 3</a>
+                      <a href="javascript:void(0);" class="text-body d-block">Example 3</a>
                       <div class="d-block text-muted text-truncate mt-n1">
                         Update change-version.js (#29736)
                       </div>
                     </div>
                     <div class="col-auto">
-                      <a href="#" class="list-group-item-actions">
-                        
+                      <a href="javascript:void(0);" class="list-group-item-actions">
+
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24"
                           viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
                           stroke-linejoin="round">
@@ -113,13 +122,13 @@
                   <div class="row align-items-center">
                     <div class="col-auto"><span class="status-dot status-dot-animated bg-green d-block"></span></div>
                     <div class="col text-truncate">
-                      <a href="#" class="text-body d-block">Example 4</a>
+                      <a href="javascript:void(0);" class="text-body d-block">Example 4</a>
                       <div class="d-block text-muted text-truncate mt-n1">
                         Regenerate package-lock.json (#29730)
                       </div>
                     </div>
                     <div class="col-auto">
-                      <a href="#" class="list-group-item-actions">
+                      <a href="javascript:void(0);" class="list-group-item-actions">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24"
                           viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
                           stroke-linejoin="round">
@@ -135,15 +144,16 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="nav-item dropdown">
+      </div> --}}
+      <div class="nav-item dropdown header">
         {{#if user}}
-        <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+        <a href="javascript:void(0);" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
+          aria-label="Open user menu">
           <span class="avatar avatar-sm">
             {{#if user.profile}}
-            <img src="/images/user_images/{{user.profile}}" />
+            <img src="/images/user_images/{{user.profile}}" style="height:32px; width:32px;" />
             {{else}}
-            <img src="/images/default_user.jpg" />
+            <img src="/images/default_user.jpg" style="height:32px; width:32px;" />
             {{/if}}
           </span>
           <div class="d-none d-xl-block ps-2">
@@ -152,9 +162,10 @@
           </div>
         </a>
         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-          <a href="#" class="dropdown-item" id="edit">Edit Profile</a>
+          <a href="javascript:void(0);" class="dropdown-item" id="edit">Edit Profile</a>
           <a href="/logout" class="dropdown-item" id="logout">Logout</a>
         </div>
+
         {{else}}
         <div class="button">
           <a href="/login">Login </a>
@@ -168,5 +179,3 @@
   </div>
   {{> users/edit}}
 </header>
-<script src="/javascripts/user/edit.js"></script>
-

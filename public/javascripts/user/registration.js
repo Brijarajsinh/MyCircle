@@ -55,6 +55,13 @@ $(document).ready(function () {
                 equalTo: 'Password Not Matched'
             },
         },
+        errorPlacement: function (error, element) {
+            if (element.attr('name') == "gender") {
+                error.insertAfter("#Gendererror");
+            } else {
+                error.insertAfter(element);
+            }
+        },
         submitHandler: function () {
             let data = {
                 fname: $("#rfname").val().trim(),
@@ -69,13 +76,10 @@ $(document).ready(function () {
                 data: data,
                 success: function (res) {
                     if (res.type == 'error') {
-                        alert(res.message);
-                        window.location.href('/login');
+                        window.location.href = 'http://localhost:3000/login';
                     }
-                    else{
-                        // res.type == 'success'
-                        alert("Registration done...");
-                        window.location.href= 'http://localhost:3000/';
+                    else {
+                        window.location.href = "http://localhost:3000/"
                     }
                 },
                 error: function (err) {

@@ -8,11 +8,14 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.type == 'success') {
-                    alert(res.message);
-                    window.location.reload();
+                    toastr.warning(res.message);
+                    $("#listPost").load('/' + ' #listPost > *', function (data) {
+                    });
                 }
                 else {
-                    alert(res.message)
+                    toastr.success(res.message);
+                    $("#listPost").load('/' + ' #listPost > *', function (data) {
+                    });
                 }
             },
             error: function (err) {

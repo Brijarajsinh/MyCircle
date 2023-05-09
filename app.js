@@ -42,7 +42,7 @@ const hbs = exHbs.create({
   helpers: {
     ...helpers,
     dateConvert: function (date1) {
-      return moment(date1).format('MMMM Do YYYY, h:mm:ss a');
+      return moment(date1).format('DD/MM/YYYY, h:mm a');
     },
   }
 });

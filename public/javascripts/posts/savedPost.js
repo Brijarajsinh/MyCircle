@@ -10,6 +10,9 @@ $(document).ready(function () {
                 if (res.type == 'success') {
                     alert(res.message);
                     window.location.reload();
+                    // toastr.warning(res.message);
+                    // $("#listPost").load('/' + ' #listPost > *', function (data) {
+                    // });
                 }
                 else {
                     alert("Please Login TO SAVE this post...");

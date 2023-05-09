@@ -1,13 +1,28 @@
 $(document).ready(function () {
 
-$(".addPostModal").on('click',function(){
-    $("#addPost").modal('show');
-});
+    $(".addPostModal").on('click', function () {
+        $("#addPost").modal('show');
+    });
 
-$(".closeAddPost").on('click',function(){
-    $("#addPost").modal('toggle');
-    
-})
+    $(".closeAddPost").on('click', function () {
+        $("#addPost").modal('toggle');
+    });
+
+
+    // $("#image").on('change', function () {
+    //     var file = this.files[0];
+    //     if (Math.round(file.size / (1024 * 1024)) > 2) { // make it in MB so divide by 1024*1024
+    //         alert('Please select image size less than 2 MB');
+    //         $("#image").val("");
+    //         return true;
+    //     }
+    // });
+
+
+    $.validator.addMethod('filesize', function (value, element, param) {
+        return this.optional(element) || (element.files[0].size <= param * 1000000)
+    }, 'File size must be less than {2} MB');
+
     $("#addPostForm").validate({
         keypress: true,
         rules: {
@@ -19,7 +34,8 @@ $(".closeAddPost").on('click',function(){
                 maxlength: 300
             },
             "image": {
-                extension: "gif|jpeg|png|jpg"
+                extension: "gif|jpeg|png|jpg",
+                filesize:2
             }
         },
         messages: {
@@ -31,13 +47,19 @@ $(".closeAddPost").on('click',function(){
                 maxlength: "Description length must less than 300 characters"
             },
             "image": {
-                extension: "Please select .gif , .png or .jpeg/.jpg file"
+                extension: "Please select .gif , .png or .jpeg/.jpg file",
+                filesize:"File must be less than 2 MB"
+            }
+        },
+        errorPlacement: function (error, element) {
+            if (element.attr('name') == "image") {
+                error.insertAfter("#postError");
+            } else {
+                error.insertAfter(element);
             }
         },
         submitHandler: function () {
-            // alert("POST WILL BE ADDED");
             var formData = new FormData();
-            // const formData = new FormData($(form)[0]);
             formData.append('title', $("form#addPostForm [name=title]").val());
             formData.append('description', $("#description").val());
             formData.append('files', $("#image")[0].files[0]);
@@ -50,7 +72,13 @@ $(".closeAddPost").on('click',function(){
                 success: function (res) {
                     if (res.type == 'success') {
                         $('#addPost').modal().hide();
-                        alert("Post added successfully");
+
+                        toastr.success("post added", {timeOut: 3000});
+
+
+                        // toastr.success("post added successfully", {timeOut: 5000});
+                        // $("#listPost").appendChild("<b>Prepended text</b>. ");
+                        // alert("Post added successfully");
                         window.location.reload();
                     }
                     else {

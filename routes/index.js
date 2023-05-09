@@ -4,6 +4,7 @@ const UserModel = require('../schema/userSchema');
 const PostModel = require('../schema/postSchema');
 const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
+const likedPostModel = require('../schema/likes');
 const { default: mongoose } = require('mongoose');
 
 const md5 = require('md5');
@@ -14,24 +15,25 @@ const { rawListeners } = require('../schema/savedPost');
 //GET Route to render LOGIN Page
 router.get('/login', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  next();
+  next()
 }, function (req, res, next) {
-  console.log("LOGIN GET CALLED");
-  res.render('login', { title: 'Login', layout: "before-login" });
+  if (req.user) {
+    return res.redirect('/');
+  }
+  else {
+    res.render('login', { title: 'Login', layout: "before-login" });
+  }
 });
 
 //GET Route to render Registration Page
 router.get('/registration', function (req, res, next) {
-  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  next();
-}, function (req, res, next) {
   res.render('registration', { title: 'Registration', layout: "before-login" });
 });
 
 //GET Route to Logout user
 router.get('/logout', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  next();
+  next()
 }, async function (req, res, next) {
   req.logOut();
   req.session = null;
@@ -60,11 +62,10 @@ router.post('/login', function (req, res, next) {
     });
   })(req, res, next);
 });
-
-
+//Displays all the posts
 router.get('/', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  next();
+  next()
 }, async function (req, res, next) {
   try {
     let page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
@@ -81,7 +82,7 @@ router.get('/', function (req, res, next) {
     if (req.user) {
       var userId = new mongoose.Types.ObjectId(req.user._id);
       var statistics = await statisticsModel.findOne({
-        user_id: req.user._id
+        user_id: userId
       }).lean();
     }
     //SEARCHING Posts by 
@@ -89,12 +90,14 @@ router.get('/', function (req, res, next) {
       find.$or = [
         {
           "title": {
-            $regex: req.query.search, $options: "i"
+            $regex: req.query.search
+            , $options: "i"
           }
         },
         {
           "description": {
-            $regex: req.query.search, $options: "i"
+            $regex: req.query.search
+            , $options: "i"
           }
         }
       ]
@@ -181,6 +184,27 @@ router.get('/', function (req, res, next) {
         }
       },
       {
+        $lookup: {
+          from: "likedposts",
+          let: { postID: "$_id" },
+          pipeline: [
+            {
+              $match:
+              {
+                $expr: {
+                  $and:
+                    [
+                      { $eq: ["$postID", "$$postID"] },
+                      { $eq: ["$userID", userId] }
+                    ]
+                }
+              }
+            }
+          ],
+          as: "liked"
+        }
+      },
+      {
         $project: {
           _id: 1,
           title: 1,
@@ -191,7 +215,8 @@ router.get('/', function (req, res, next) {
             $toString: "$user_id"
           },
           user: { $arrayElemAt: ["$user", 0] },
-          saved: { $size: '$saved' }
+          saved: { $size: '$saved' },
+          liked: { $size: '$liked' }
         }
       }, {
         $sort: sort
@@ -209,10 +234,12 @@ router.get('/', function (req, res, next) {
     }
     if (req.xhr) {
       console.log("AJAX called");
+      // console.log(posts);
       res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
     }
     else {
       console.log("AJAX not called");
+      // console.log(posts);
       res.render('timeline', { title: 'Timeline', posts: posts, page: page, archived: archived, statistics: statistics });
     }
   } catch (error) {

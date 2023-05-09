@@ -1,82 +1,124 @@
-{{#each posts}}
-<div class="col-4 card  mb-3">
-    <div class="card-header bg-transparent row">
-        <div class="avatar avatar-m col-2"
-            style="background-image: url(/images/user_images/{{user.profile}}); border-radius: 50%; text-align: start;">
-        </div>
-        <div class="d-block col">
-            <div>{{title}}</div>
-            <div>Post by {{user.fname}} {{user.lname}}</div>
-        </div>
-        {{#if @root.user._id }}
-        <div class="col">
-            <a class="nav-link " href="#navbar-base" data-bs-toggle="dropdown"
-                style="margin-top: -3px;margin-left: 237px;" data-bs-auto-close="outside" role="button"
-                aria-expanded="false">
-                <span class="nav-link-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                        class="bi bi-three-dots" viewBox="0 0 16 16">
-                        {{!-- style="margin-top: -3px;margin-left: 237px;" --}}
-                        <path
-                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-                    </svg>
-                </span>
-            </a>
-            <div class="dropdown-menu">
-                <div class="dropdown-menu-columns">
-                    <div class="dropdown-menu-column">
-                        {{#compare @root.user._id "==" user_id}}
+<div id="listPost" class="row">
+    {{#each posts}}
+    <div class="col-4 card  mb-3">
+        <div class="card-header bg-transparent row">
+            <div class="avatar avatar-m col-2"
+                style="background-image: url(/images/user_images/{{user.profile}}); border-radius: 50%; text-align: start;">
+            </div>
+            <div class="d-block col">
+                <div>{{title}}</div>
+                <div>Post by {{user.fname}} {{user.lname}}</div>
+            </div>
+            {{#if @root.user._id }}
+            <div class="col">
+                <a class="nav-link " href="#navbar-base" data-bs-toggle="dropdown"
+                    style="margin-top: -3px;margin-left: 237px;" data-bs-auto-close="outside" role="button"
+                    aria-expanded="false">
+                    <span class="nav-link-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            class="bi bi-three-dots" viewBox="0 0 16 16">
+                            {{!-- style="margin-top: -3px;margin-left: 237px;" --}}
+                            <path
+                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                        </svg>
+                    </span>
+                </a>
+                <div class="dropdown-menu">
+                    <div class="dropdown-menu-columns">
+                        <div class="dropdown-menu-column">
+                            {{#compare @root.user._id "==" user_id}}
 
-                        {{#if ../archived}}
-                        <a class="dropdown-item" href="#" data-postid={{_id}} id="archive-btn">
-                            Remove From Archive
-                        </a>
-                        {{else}}
-                        <a class="dropdown-item edit-btnn" href="javascript:void(0)" data-postid={{_id}} id="edit-btn">
-                            Edit Post
-                        </a>
-                        <a class="dropdown-item" href="#" data-postid={{_id}} id="archive-btn">
-                            Archive Post
-                        </a>
-                        {{/if}}
-                        {{/compare}}
-                        {{#compare @root.user._id "!=" user_id}}
-                        <a class="dropdown-item save-btn" href="#" data-postid={{_id}} id="save-btn">
-                            {{#if saved}}Unsave{{else}}Save{{/if}}
-                        </a>
-                        {{/compare}}
+                            {{#if ../archived}}
+                            <a class="dropdown-item" href="javascript:void(0);" data-postid={{_id}} id="archive-btn">
+                                Remove From Archive
+                            </a>
+                            {{else}}
+                            <a class="dropdown-item edit-btnn" href="javascript:void(0)" data-postid={{_id}}
+                                id="edit-btn">
+                                Edit Post
+                            </a>
+                            <a class="dropdown-item" href="javascript:void(0);" data-postid={{_id}} id="archive-btn">
+                                Archive Post
+                            </a>
+                            {{/if}}
+                            {{/compare}}
+                            {{#compare @root.user._id "!=" user_id}}
+                            <a class="dropdown-item save-btn" href="javascript:void(0);" data-postid={{_id}}
+                                id="save-btn">
+                                {{#if saved}}Unsave{{else}}Save{{/if}}
+                            </a>
+                            {{/compare}}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {{/if}}
-    </div>
-    <div class="card-body row">
-        <div class="col">
-            {{#if postImage}}
-            <img src="/images/posts/{{postImage}}" style="height:300px; width:250px"/>
-            {{else}}
-            <img src="/images/default_post.jpeg" style="height:300px; width:250px"/>
             {{/if}}
         </div>
-        <div class="col">
-            <span>Post Description</span>
-            <p class="card-text">{{#if description}}{{description}}{{else}}No Description Available{{/if}}</p>
+        <div class="card-body row">
+            <div class="col">
+                {{#if postImage}}
+                <img src="/images/posts/{{postImage}}" style="height:300px; width:250px" />
+                {{else}}
+                <img src="/images/default_post.jpeg" style="height:300px; width:250px" />
+                {{/if}}
+            </div>
+            <div class="col">
+                <span>Post Description</span>
+                <p class="card-text">{{#if description}}{{description}}{{else}}No Description
+                    Available{{/if}}</p>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent row">
+            <div class="col-md-10">
+                Posted on {{dateConvert createdAt}}
+            </div>
+            {{#if @root.user}}
+            {{#if ../archived}}
+            {{else}}
+            <div class="like avatar avatar-m col-2"
+                style="background-image: url(/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}); border-radius: 50%; text-align: start;"
+                data-postid={{_id}}>
+            </div>
+            {{!-- <div class="col-2 like" data-postid={{_id}}>
+                <img src="/images/{{#if liked}}like.jpeg{{else}}like.avif{{/if}}" />
+            </div>
+            <div id={{_id}} class="like avatar avatar-m col-2"
+                style="background-image: url(/images/like.avif); border-radius: 50%; text-align: start;"
+                data-postid={{_id}}>
+            </div> --}}
+            {{!-- <div class="col">
+                Comment
+            </div> --}}
+            {{/if}}
+            {{/if}}
         </div>
     </div>
-    <div class="card-footer bg-transparent">Posted on {{dateConvert createdAt}}</div>
+    {{/each}}
 </div>
-{{/each}}
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
+
+{{!-- <nav aria-label="Page navigation example">
+    <ul class="m-4 pagination justify-content-center">
+        <li class="page-item">
+            <a href="javascript:void(0);" aria-label="Previous" class="pagewise page-link" data-page="prev">
+                PREV
+            </a>
+        </li>
         {{#each page}}
-        <li class="page-item"><a class="page-link pagewise" data-page={{this}}>{{this}}</a></li>
+        <li class="page-item">
+            <a class="page-link pagewise" href="javascript:void(0);" data-page={{this}}>{{this}}</a>
+        </li>
         {{/each}}
+         <li class="page-item">
+            <a href="javascript:void(0);" aria-label="Next" class="pagewise page-link" data-page="next">
+                NEXT
+            </a>
+        </li> 
     </ul>
-</nav>
+</nav> --}}
+
 {{> posts/edit}}
 {{> posts/archive}}
 {{> posts/save}}
-{{!-- {{> posts/filter}} --}}
-
 <script src="/javascripts/posts/filter.js"></script>
+{{!--
+<script src="/javascripts/posts/like.js"></script> --}}

@@ -5,15 +5,15 @@
                 <h2 class="h2 text-center mb-4">Login to your account</h2>
                 {{#if flash}}
                 <div class="alert alert-danger ">{{flash.message}}</div>
-                {{/if}} 
+                {{/if}}
                 <form action="/login" id="LoginForm" method="post">
                     <div class="mb-3">
-                        <label class="form-label">Email address</label>
+                        <label class="form-label">Email address<sup class="text-danger">*(required)</sup></label>
                         <input type="email" class="form-control" placeholder="abc@email.com" name="email">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
-                            Password
+                            Password<sup class="text-danger">*(required)</sup>
                         </label>
                         <div class="input-group input-group-flat">
                             <input type="password" class="form-control" placeholder="Your password" name="pswd">

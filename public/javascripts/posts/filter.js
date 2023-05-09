@@ -4,7 +4,7 @@ $(document).ready(function () {
         let filter = $(".filter").val();
         let sort = $(".sort").val();
         let search = $(".search").val();
-
+        let order = $(".order").val();
         if (filter == "arch") {
             url += `arch=1&`
         }
@@ -34,7 +34,6 @@ $(document).ready(function () {
             }
         });
     });
-
     $(".search").unbind().on('input', function () {
         $.ajax({
             type: "get",
@@ -72,4 +71,39 @@ $(document).ready(function () {
             }
         })
     });
-})
+    $(".order").unbind('change').on('change', function () {
+        $.ajax({
+            type: "get",
+            url: getURL(),
+            success: function (res) {
+                $("#listPost").html(res);
+            },
+            error: function (err) {
+                console.log(err.toString());
+            }
+        })
+    });
+
+
+    $(document).on("click", ".like", function () {
+        $.ajax({
+            type: "post",
+            url: '/posts/like',
+            data: {
+                postId: $(this).data("postid")
+            },
+            success: function (res) {
+                if (res.type == "success") {
+                    toastr.success(res.message);
+                    $("#listPost").load('/' + ' #listPost > *', function (data) {
+                    });
+                    // alert(res.message);
+                }
+            },
+            error: function (err) {
+                console.log(err.toString());
+                alert(err.toString());
+            }
+        })
+    })
+});

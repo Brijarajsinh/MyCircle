@@ -3,6 +3,7 @@ var router = express.Router();
 const PostModel = require('../schema/postSchema');
 const UserModel = require('../schema/userSchema');
 const savedPostModel = require('../schema/savedPost');
+const likedPostModel = require('../schema/likes');
 const { default: mongoose } = require('mongoose');
 const multer = require('multer');
 var path = require('path');
@@ -28,7 +29,6 @@ var post = multer({
 // POST Route to Save the POST in post collection
 router.post('/', post.single('files'), async function (req, res, next) {
     try {
-        console.log("POST ROUTE");
         let post_details = new PostModel({
             "title": req.body.title,
             "description": req.body.description,
@@ -57,14 +57,12 @@ router.post('/', post.single('files'), async function (req, res, next) {
 //POST Route to pre-fill post details while editing the post
 router.post('/edit', async function (req, res, next) {
     try {
-        console.log("AJAX CALLED");
         const postId = new mongoose.Types.ObjectId(req.body.postId);
         let post_detail = await PostModel.findOne({ _id: postId });
         let response = {
             type: 'success',
             data: post_detail
         }
-        console.log(response);
         res.send(response);
     } catch (error) {
         console.log(error);
@@ -103,7 +101,7 @@ router.put('/', post.single('files'), async function (req, res, next) {
         res.send(response);
     }
 });
-     
+
 //POST Route to save post by current user
 router.post('/save', async function (req, res, next) {
     try {
@@ -119,14 +117,14 @@ router.post('/save', async function (req, res, next) {
         }
         else {
             let createdBy = await PostModel.findOne({
-                _id:postId
-            },{
-                "_id":0,"user_id":1
+                _id: postId
+            }, {
+                "_id": 0, "user_id": 1
             });
             let savedPostDetails = new savedPostModel({
                 "postID": postId,
                 "userID": req.user._id,
-                "createdBy":createdBy.user_id
+                "createdBy": createdBy.user_id
             })
             await savedPostDetails.save();
             const response = {
@@ -137,7 +135,7 @@ router.post('/save', async function (req, res, next) {
         }
 
     } catch (error) {
-        console.log("Error generated during user  saves this post = postID")
+        console.log("Error generated during user  saves this post")
         console.log(error);
         let response = {
             type: 'error',
@@ -147,8 +145,49 @@ router.post('/save', async function (req, res, next) {
     }
 })
 
+router.post('/like', async function (req, res, next) {
+    try {
+        let { postId } = req.body;
+        const liked = await likedPostModel.countDocuments({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
+        if (liked) {
+            await likedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
+            const response = {
+                type: 'success',
+                message: "Disliked"
+            }
+            res.send(response);
+        }
+        else {
+            let createdBy = await PostModel.findOne({
+                _id: postId
+            }, {
+                "_id": 0, "user_id": 1
+            });
+            let likedPostDetails = new likedPostModel({
+                "postID": postId,
+                "userID": req.user._id,
+                "createdBy": createdBy.user_id
+            })
+            await likedPostDetails.save();
+            const response = {
+                type: 'success',
+                message: "Liked"
+            }
+            res.send(response);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        let response = {
+            type: "error",
+            message: error.toString()
+        }
+        res.send(response);
+    }
+});
 
 //DELETE Route to archive post
+
 router.delete('/', async function (req, res, next) {
     try {
         let { postId } = req.body;
@@ -157,7 +196,7 @@ router.delete('/', async function (req, res, next) {
         if (archived) {
             await PostModel.updateOne({ _id: postId }, { isArchived: false });
             let response = {
-                type: 'success',
+                type: 'error',
                 message: 'Post Remove from Archive list'
             }
             res.send(response);
@@ -166,7 +205,7 @@ router.delete('/', async function (req, res, next) {
             await PostModel.updateOne({ _id: postId }, { isArchived: true });
             let response = {
                 type: 'success',
-                message: 'Post Archived Successfully'
+                message: 'Post Archived'
             }
             res.send(response);
         }
