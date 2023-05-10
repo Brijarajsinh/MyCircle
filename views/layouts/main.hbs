@@ -4,7 +4,6 @@
 <head>
   <title>{{title}}</title>
   {{> scripts}}
-
   {{> header}}
   {{> navbar}}
   {{!--
@@ -15,18 +14,45 @@
 
 <body>
   {{{body}}}
+  {{!--
+  <script src="/javascripts/posts/archive.js"></script> --}}
+  {{!--
+  <script src="/javascripts/posts/edit.js"></script> --}}
+  {{!--
+  <script src="/javascripts/posts/filter.js"></script> --}}
+  {{!--
+  <script src="/javascripts/posts/savedPost.js"></script> --}}
+  <link href="/stylesheets/style_login.css" rel="stylesheet" />
+  {{!--
+  <script src="/javascripts/posts/archive.js"></script>
+  <script src="/javascripts/posts/edit.js"></script> --}}
+  {{!--
+  <script>
+    console.log("hhhhhhhhhh");
+    console.log("{{user}}");
+    if ("{{user}}") {
+      var socket = io({
+        query: { "RoomID", "{{user._id}}"}
+      });
+      console.log("444444");
+      socket.on("userName", (data) => {
+        alert(data + " Liked Your POST");
+      })
+    }
+
+
+
+  </script> --}}
+  {{#if user}}
+  <script>
+    var socket = io({
+      query: { "RoomID": "{{user._id}}" }
+    });
+    socket.on("userName", (data) => {
+      alert(data.userNAME + " Liked Your POST");
+    })
+  </script>
+  {{/if}}
 </body>
-{{!--
-<script src="/javascripts/posts/archive.js"></script> --}}
-{{!--
-<script src="/javascripts/posts/edit.js"></script> --}}
-{{!--
-<script src="/javascripts/posts/filter.js"></script> --}}
-{{!--
-<script src="/javascripts/posts/savedPost.js"></script> --}}
-<link href="/stylesheets/style_login.css" rel="stylesheet" />
-{{!--
-<script src="/javascripts/posts/archive.js"></script>
-<script src="/javascripts/posts/edit.js"></script> --}}
 
 </html>

@@ -147,7 +147,7 @@ router.post('/save', async function (req, res, next) {
 
 router.post('/like', async function (req, res, next) {
     try {
-        let { postId } = req.body;
+        let { postId, createdBy } = req.body;
         const liked = await likedPostModel.countDocuments({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
         if (liked) {
             await likedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
@@ -158,21 +158,20 @@ router.post('/like', async function (req, res, next) {
             res.send(response);
         }
         else {
-            let createdBy = await PostModel.findOne({
-                _id: postId
-            }, {
-                "_id": 0, "user_id": 1
-            });
             let likedPostDetails = new likedPostModel({
                 "postID": postId,
                 "userID": req.user._id,
-                "createdBy": createdBy.user_id
+                "createdBy": createdBy
             })
             await likedPostDetails.save();
             const response = {
                 type: 'success',
                 message: "Liked"
             }
+            io.to(createdBy).emit('userName', {
+                'postID': postId,
+                'userNAME': req.user.fname
+            });
             res.send(response);
         }
     }

@@ -75,7 +75,7 @@ module.exports = {
     passport.deserializeUser(function (req,user, done) {
       try {
         console.log("deserializeUser");
-        console.log(req.user);
+        // console.log(req.user);
         done(null, user);
       } catch (error) {
         console.log(error);
@@ -84,8 +84,8 @@ module.exports = {
   },
   commonMiddleware: function (req, res, next) {
     if (req.isAuthenticated()) {
-      console.log("CURRENT LOGGED IN USER IS:->")
-      console.log(req.user);
+      // console.log("CURRENT LOGGED IN USER IS:->")
+      // console.log(req.user);
       return next();
     }
     return res.redirect('/login');

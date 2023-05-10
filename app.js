@@ -25,12 +25,12 @@ const flash = require('connect-flash');
 const auth = require('./helpers/auth');
 const { log } = require('console');
 
-
 //Declaring some common variable globally so it can use multiple time in different files
 global.mongoose = require("mongoose");
 
 require('./connection')();
 var app = express();
+
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json());

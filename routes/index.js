@@ -234,11 +234,13 @@ router.get('/', function (req, res, next) {
     }
     if (req.xhr) {
       console.log("AJAX called");
-      // console.log(posts);
+
+      // console.log(page);
       res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
     }
     else {
       console.log("AJAX not called");
+      // console.log(page);
       // console.log(posts);
       res.render('timeline', { title: 'Timeline', posts: posts, page: page, archived: archived, statistics: statistics });
     }

@@ -77,7 +77,7 @@
             {{else}}
             <div class="like avatar avatar-m col-2"
                 style="background-image: url(/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}); border-radius: 50%; text-align: start;"
-                data-postid={{_id}}>
+                data-postid={{_id}} data-created={{user_id}}>
             </div>
             {{!-- <div class="col-2 like" data-postid={{_id}}>
                 <img src="/images/{{#if liked}}like.jpeg{{else}}like.avif{{/if}}" />
@@ -94,31 +94,31 @@
         </div>
     </div>
     {{/each}}
+    <nav aria-label="Page navigation example">
+        <ul class="m-4 pagination justify-content-center">
+            {{!-- <li class="page-item">
+                <a href="javascript:void(0);" aria-label="Previous" class="pagewise page-link" data-page="prev">
+                    PREV
+                </a>
+            </li> --}}
+            {{#each page}}
+            <li class="page-item">
+                <a class="page-link pagewise" href="javascript:void(0);" data-page={{this}}>{{this}}</a>
+            </li>
+            {{/each}}
+            {{!-- <li class="page-item">
+                <a href="javascript:void(0);" aria-label="Next" class="pagewise page-link" data-page="next">
+                    NEXT
+                </a>
+            </li> --}}
+        </ul>
+    </nav>
 </div>
-
-{{!-- <nav aria-label="Page navigation example">
-    <ul class="m-4 pagination justify-content-center">
-        <li class="page-item">
-            <a href="javascript:void(0);" aria-label="Previous" class="pagewise page-link" data-page="prev">
-                PREV
-            </a>
-        </li>
-        {{#each page}}
-        <li class="page-item">
-            <a class="page-link pagewise" href="javascript:void(0);" data-page={{this}}>{{this}}</a>
-        </li>
-        {{/each}}
-         <li class="page-item">
-            <a href="javascript:void(0);" aria-label="Next" class="pagewise page-link" data-page="next">
-                NEXT
-            </a>
-        </li> 
-    </ul>
-</nav> --}}
 
 {{> posts/edit}}
 {{> posts/archive}}
 {{> posts/save}}
+
 <script src="/javascripts/posts/filter.js"></script>
 {{!--
 <script src="/javascripts/posts/like.js"></script> --}}
