@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const PostModel = require('../schema/postSchema');
-const UserModel = require('../schema/userSchema');
+const notificationModel = require('../schema/notificationSchema');
 const savedPostModel = require('../schema/savedPost');
 const likedPostModel = require('../schema/likes');
 const { default: mongoose } = require('mongoose');
@@ -168,10 +168,18 @@ router.post('/like', async function (req, res, next) {
                 type: 'success',
                 message: "Liked"
             }
-            io.to(createdBy).emit('userName', {
-                'postID': postId,
-                'userNAME': req.user.fname
+            let notificationDetails = new notificationModel({
+                "userID": createdBy,
+                "description": req.user.fname + ' Liked your post'
             });
+            await notificationDetails.save();
+            if (createdBy != req.user._id) {
+
+                io.to(createdBy).emit('userName', {
+                    'postID': postId,
+                    'userNAME': req.user.fname
+                });
+            }
             res.send(response);
         }
     }

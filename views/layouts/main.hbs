@@ -26,30 +26,53 @@
   {{!--
   <script src="/javascripts/posts/archive.js"></script>
   <script src="/javascripts/posts/edit.js"></script> --}}
-  {{!--
-  <script>
-    console.log("hhhhhhhhhh");
-    console.log("{{user}}");
-    if ("{{user}}") {
-      var socket = io({
-        query: { "RoomID", "{{user._id}}"}
-      });
-      console.log("444444");
-      socket.on("userName", (data) => {
-        alert(data + " Liked Your POST");
-      })
-    }
 
-
-
-  </script> --}}
   {{#if user}}
   <script>
     var socket = io({
       query: { "RoomID": "{{user._id}}" }
     });
     socket.on("userName", (data) => {
-      alert(data.userNAME + " Liked Your POST");
+      toastr.success(data.userNAME + ' Liked Your Post');
+    })
+
+    $(document).ready(function () {
+      $.ajax({
+        type: "get",
+        url: '/notification',
+        success: function (res) {
+          var count = res.data.length
+          $('.notify').append(`<span class="badge bg-red">${count}</span>`);
+          for (let value in res.data) {
+            $('.notification').append(`<div class="col p-2"><a id=${res.data[value]._id} href="javascript:void(0);"
+                        class="text-body d-block likeNotification"><b>${res.data[value].description}</b></a></div>`);
+          }
+        },
+        error: function (err) {
+          alert(res.message);
+        }
+      });
+      $(document).on('click', '.likeNotification', function () {
+        $.ajax({
+          type: "delete",
+          url: '/notification',
+          data: {
+            "_id": $(this).attr('id')
+          },
+          success: function (res) {
+            if (res.type == 'success') {
+              var count = res.data
+              $('.notify').append(`<span class="badge bg-red">${count}</span>`);
+              $(`#${res.delete}`).parentsUntil('.notification').remove();
+              console.log("notification removed");
+            }
+          },
+          error: function (err) {
+            alert(res.message);
+          }
+        })
+        //
+      })
     })
   </script>
   {{/if}}

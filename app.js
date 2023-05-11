@@ -93,6 +93,7 @@ app.use('/posts', require('./routes/posts'));
 app.use('/report', require('./routes/report'));
 // app.use('/save',require('./routes/savedPost'));
 app.use('/users', require('./routes/users'));
+app.use('/notification', require('./routes/notification'));
 
 var cron = require('node-cron');
 

@@ -4,7 +4,6 @@ const UserModel = require('../schema/userSchema');
 const PostModel = require('../schema/postSchema');
 const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
-const likedPostModel = require('../schema/likes');
 const { default: mongoose } = require('mongoose');
 
 const md5 = require('md5');
@@ -77,7 +76,6 @@ router.get('/', function (req, res, next) {
       sort.title = 1
     }
     sort._id = -1;
-
     let find = {}
     if (req.user) {
       var userId = new mongoose.Types.ObjectId(req.user._id);
@@ -234,7 +232,6 @@ router.get('/', function (req, res, next) {
     }
     if (req.xhr) {
       console.log("AJAX called");
-
       // console.log(page);
       res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
     }
@@ -242,7 +239,8 @@ router.get('/', function (req, res, next) {
       console.log("AJAX not called");
       // console.log(page);
       // console.log(posts);
-      res.render('timeline', { title: 'Timeline', posts: posts, page: page, archived: archived, statistics: statistics });
+      res.render('timeline', { title: 'Timeline', posts: posts, page: page, statistics: statistics });
+      // archived: archived,
     }
   } catch (error) {
     console.log(error);

@@ -18,7 +18,8 @@ $(document).ready(function () {
         }
         return url;
     }
-    $(".pagewise").unbind().on("click", function () {
+    $(document).on("click", ".pagewise", function () {
+        // $(".pagewise").unbind().on("click", function () {
         let page = $(this).data("page");
         let url = getURL();
         url += `page=${page}`;
@@ -88,14 +89,13 @@ $(document).ready(function () {
             url: '/posts/like',
             data: {
                 postId: $(this).data("postid"),
-                createdBy:$(this).data("created")
+                createdBy: $(this).data("created")
             },
             success: function (res) {
                 if (res.type == "success") {
                     toastr.success(res.message);
                     $("#listPost").load('/' + ' #listPost > *', function (data) {
                     });
-                    // alert(res.message);
                 }
             },
             error: function (err) {
