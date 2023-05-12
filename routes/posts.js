@@ -88,7 +88,8 @@ router.put('/', post.single('files'), async function (req, res, next) {
         }, { $set: updated_posts });
 
         let response = {
-            type: 'success'
+            type: 'success',
+            id:postId
         }
         res.send(response);
     } catch (error) {
@@ -110,7 +111,8 @@ router.post('/save', async function (req, res, next) {
         if (saved) {
             await savedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
             const response = {
-                type: 'success',
+                type: 'error',
+                id: postId,
                 message: "Post Unsaved Successfully"
             }
             res.send(response);
@@ -129,11 +131,11 @@ router.post('/save', async function (req, res, next) {
             await savedPostDetails.save();
             const response = {
                 type: 'success',
+                id: postId,
                 message: "Post Saved Successfully"
             }
             res.send(response);
         }
-
     } catch (error) {
         console.log("Error generated during user  saves this post")
         console.log(error);
@@ -152,7 +154,8 @@ router.post('/like', async function (req, res, next) {
         if (liked) {
             await likedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
             const response = {
-                type: 'success',
+                type: 'error',
+                id:postId,
                 message: "Disliked"
             }
             res.send(response);
@@ -166,15 +169,15 @@ router.post('/like', async function (req, res, next) {
             await likedPostDetails.save();
             const response = {
                 type: 'success',
+                id:postId,
                 message: "Liked"
             }
-            let notificationDetails = new notificationModel({
-                "userID": createdBy,
-                "description": req.user.fname + ' Liked your post'
-            });
-            await notificationDetails.save();
             if (createdBy != req.user._id) {
-
+                let notificationDetails = new notificationModel({
+                    "userID": createdBy,
+                    "description": req.user.fname + ' Liked your post'
+                });
+                await notificationDetails.save();
                 io.to(createdBy).emit('userName', {
                     'postID': postId,
                     'userNAME': req.user.fname
@@ -204,6 +207,7 @@ router.delete('/', async function (req, res, next) {
             await PostModel.updateOne({ _id: postId }, { isArchived: false });
             let response = {
                 type: 'error',
+                id: postId,
                 message: 'Post Remove from Archive list'
             }
             res.send(response);
@@ -212,6 +216,7 @@ router.delete('/', async function (req, res, next) {
             await PostModel.updateOne({ _id: postId }, { isArchived: true });
             let response = {
                 type: 'success',
+                id: postId,
                 message: 'Post Archived'
             }
             res.send(response);

@@ -68,19 +68,30 @@ $(document).ready(function () {
                 contentType: false,
                 processData: false,
                 success: async function (res) {
-                    debugger
                     if (res.type == 'success') {
+                        let url = '/?';
+
+                        var filter = $(".filter").val();
+                        if (filter == "arch") {
+                            url += `arch=1&`
+                        }
+                        else {
+                            url += `filter=${filter}&`
+                        }
                         $('#editModal').modal('toggle');
-                        // toastr.success("Details edited", {timeOut: 3000});
+                        toastr.success("User's Details edited");
 
-                        // $(".header").load('/' + ' .header > *', function (data) {
+                        // $(".user-details").load(`${url}` + ' .user-details > *', function (data) {
                         // });
+                        // setInterval(function () {
+                        //     $(".user-details").load(`${url}` + " .user-details>*", "");
+                        // }, 1000);
+                        $("#listPost").load(`${url}` + ' #listPost > *', function (data) {
+                        });
 
-                        // $("#listPost").load('/' + ' #listPost > *', function (data) {
-                        // });
 
-                        alert("Profile edited successfully");
-                         window.location.reload();
+                        // alert("Profile edited successfully");
+                        //  window.location.reload();
                     }
                     else {
                         alert(res.message);

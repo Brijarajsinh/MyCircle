@@ -6,7 +6,7 @@ $(document).ready(function () {
         $("#editPostModal").modal('toggle');
     });
  
-    $(".edit-btnn").unbind('click').on("click", function () {
+    $(".edit-btnn").off().on("click", function () {
         currentPostId = $(this).data("postid");
         $.ajax({
             type: "post",
@@ -84,11 +84,9 @@ $(document).ready(function () {
                 success: function (res) {
                     if (res.type == 'success') {
                         $("#editPostModal").modal('toggle');
-                        // toastr.success("Post Edited");
-                        // $("#listPost").load('/' + ' #listPost > *', function (data) {
-                        // });
-                        alert("Post edited successfully");
-                        window.location.reload();
+                        toastr.success("Post Edited");
+                        $(`#${res.id}`).load('/' + ` #${res.id} > *`, function (data) {
+                        });
                     }
                     else {
                         alert(res.message);

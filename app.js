@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 const moment = require('moment');
 const helpers = require('handlebars-helpers')();
 
+//Requiring model of users,posts,savedPost to create report and statistics
 const userModel = require('./schema/userSchema');
 const PostModel = require('./schema/postSchema');
 const savedPostModel = require('./schema/savedPost');
@@ -23,7 +24,6 @@ const flash = require('connect-flash');
 
 //Requiring AUTH.JS file to authenticate Process
 const auth = require('./helpers/auth');
-const { log } = require('console');
 
 //Declaring some common variable globally so it can use multiple time in different files
 global.mongoose = require("mongoose");
@@ -93,7 +93,6 @@ app.use('/posts', require('./routes/posts'));
 app.use('/report', require('./routes/report'));
 // app.use('/save',require('./routes/savedPost'));
 app.use('/users', require('./routes/users'));
-app.use('/notification', require('./routes/notification'));
 
 var cron = require('node-cron');
 

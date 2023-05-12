@@ -5,10 +5,58 @@ const PostModel = require('../schema/postSchema');
 const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
 const { default: mongoose } = require('mongoose');
+const notificationModel = require('../schema/notificationSchema');
+
 
 const md5 = require('md5');
 const passport = require('passport');
-const { rawListeners } = require('../schema/savedPost');
+
+
+//GET API to get all notification of liked posts
+router.get('/notification', async function (req, res, next) {
+  try {
+    var notification = await notificationModel.find({
+      "userID": req.user._id,
+      "isSeen": false
+    },
+      {
+        "_id": 1,
+        "description": 1,
+        "isSeen": 1
+      }).lean();
+    res.render("partials/notification", { notifications: notification, layout: 'blank' });
+  }
+  catch (err) {
+    let response = {
+      type: "error",
+      message: err.toString()
+    }
+    res.send(response);
+  }
+})
+
+//PUT API to update notification status from isSeen : false to isSeen : true
+router.put('/notification', async function (req, res, next) {
+
+  try {
+    await notificationModel.updateOne({ "_id": req.body._id }, { $set: { "isSeen": true } });
+
+    let count = await notificationModel.countDocuments({ "userID": req.user._id,"isSeen": false })
+    let response = {
+      type: "success",
+      count: count,
+      deleted: req.body._id
+    }
+    res.send(response);
+  }
+  catch (err) {
+    let response = {
+      type: "error",
+      message: err.toString()
+    }
+    res.send(response);
+  }
+});
 
 /* GET home page. */
 //GET Route to render LOGIN Page
@@ -256,11 +304,6 @@ router.get('/check-email', async function (req, res, next) {
   let condition = {
     email: req.query.email
   }
-  // if (req.user) {
-  //   condition._id = {
-  //     $ne: req.user._id
-  //   }
-  // }
   let exist = await UserModel.countDocuments(condition);
   if (exist) return res.send(false);
   return res.send(true);
@@ -299,10 +342,6 @@ router.post('/registration', async function (req, res, next) {
           type: 'success'
         });
       });
-      // let response = {
-      //   type: "success"
-      // }
-      // return res.send(response);
     }
 
   }

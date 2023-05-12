@@ -92,9 +92,19 @@ $(document).ready(function () {
                 createdBy: $(this).data("created")
             },
             success: function (res) {
+                debugger
+                console.log("response");
+                console.log(res);
+                var filter = $(".filter").val();
+                console.log("filter " + filter);
                 if (res.type == "success") {
                     toastr.success(res.message);
-                    $("#listPost").load('/' + ' #listPost > *', function (data) {
+                    $(`#${res.id}`).load(`/?filter=${filter}` + ` #${res.id} > *`, function (data) {
+                    });
+                }
+                else {
+                    toastr.error(res.message);
+                    $(`#${res.id}`).load(`/?filter=${filter}` + ` #${res.id} > *`, function (data) {
                     });
                 }
             },

@@ -7,16 +7,17 @@ $(document).ready(function () {
                 postId: $(this).data("postid")
             },
             success: function (res) {
+                console.log("FILTER WILL BE APPLIED");
+                var filter = $(".filter").val();
                 if (res.type == 'success') {
-                    alert(res.message);
-                    window.location.reload();
-                    // toastr.warning(res.message);
-                    // $("#listPost").load('/' + ' #listPost > *', function (data) {
-                    // });
+                    toastr.success(res.message);
+                    $(`#${res.id}`).load(`/?filter=${filter}` + ` #${res.id} > *`, function (data) {
+                    });
                 }
                 else {
-                    alert("Please Login TO SAVE this post...");
-                    window.location.replace('/login');
+                    toastr.warning(res.message);
+                    $(`#listPost`).load(`/?filter=${filter}` + ` #listPost > *`, function (data) {
+                    });
                 }
             },
             error: function (err) {

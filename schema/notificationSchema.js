@@ -16,5 +16,7 @@ const notificationSchema = new mongoose.Schema({
         required:true
     }
 },option);
+
+//Creating notification model to manage notification of user (UserWise)
 const notificationModel = mongoose.model('notifications', notificationSchema);
 module.exports = notificationModel;
