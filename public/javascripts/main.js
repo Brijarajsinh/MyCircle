@@ -16,4 +16,3 @@ $('.likeNotification').on('click', function () {
         }
     })
 })
-

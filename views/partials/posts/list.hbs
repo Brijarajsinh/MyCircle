@@ -1,6 +1,6 @@
 <div id="listPost" class="row">
     {{#each posts}}
-    <div class="col-4 card  mb-3" id="{{_id}}">
+    <div class="col-4 card  mb-3" id="p{{_id}}">
         <div class="card-header bg-transparent row">
             <div class="avatar avatar-m col-2"
                 style="background-image: url(/images/user_images/{{user.profile}}); border-radius: 50%; text-align: start;">
@@ -74,11 +74,19 @@
             </div>
             {{#if @root.user}}
             {{#if ../archived}}
-            {{else}}
-            <div class="like avatar avatar-m col-2"
-                style="background-image: url(/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}); border-radius: 50%; text-align: start;"
-                data-postid={{_id}} data-created={{user_id}}>
+            <div class="col-2 text-primary">
+                <p>{{likes}} Likes</p>
             </div>
+            {{else}}
+
+            <div class="col-2 text-primary likeDetails">
+                <div class="like avatar avatar-m "
+                    style="background-image: url(/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}); border-radius: 50%; text-align: start;"
+                    data-postid={{_id}} data-created={{user_id}}>
+                </div>
+                <p>{{likes}} Likes</p>
+            </div>
+
             {{!-- <div class="col-2 like" data-postid={{_id}}>
                 <img src="/images/{{#if liked}}like.jpeg{{else}}like.avif{{/if}}" />
             </div>
@@ -90,6 +98,10 @@
                 Comment
             </div> --}}
             {{/if}}
+            {{else}}
+            <div class="col-2 text-primary">
+                <p>{{likes}} Likes</p>
+            </div>
             {{/if}}
         </div>
     </div>
@@ -114,11 +126,10 @@
         </ul>
     </nav>
 </div>
-
 {{> posts/edit}}
-{{> posts/archive}}
-{{> posts/save}}
-
+{{!-- {{> posts/filter}} --}}
 <script src="/javascripts/posts/filter.js"></script>
+<script src="/javascripts/posts/archive.js"></script>
+<script src="/javascripts/posts/savedPost.js"></script>
 {{!--
 <script src="/javascripts/posts/like.js"></script> --}}

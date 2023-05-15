@@ -5,9 +5,10 @@ $(document).ready(function () {
     $(".closeEditPostModal").on('click', function () {
         $("#editPostModal").modal('toggle');
     });
- 
-    $(".edit-btnn").off().on("click", function () {
-        currentPostId = $(this).data("postid");
+    // $(document).unbind().on('click', '.edit-btnn', function () {
+
+        $(".edit-btnn").off('click').on("click", function () {
+        // currentPostId = $(this).data("postid");
         $.ajax({
             type: "post",
             url: '/posts/edit',
@@ -18,7 +19,9 @@ $(document).ready(function () {
                 if (res.type == 'success') {
                     $(".title_old").val(res.data.title);
                     $(".description_old").val(res.data.description);
+                    $(".submit").attr('post',res.id);
                     $("#editPostModal").modal('show');
+                    currentPostId = res.id; 
                 }
                 else {
                     alert(res.message);
@@ -71,7 +74,7 @@ $(document).ready(function () {
         },
         submitHandler: function () {
             var formData = new FormData();
-            formData.append('postId', currentPostId);
+            formData.append('postId', $(".submit").attr("post"));
             formData.append('title', $(".title_old").val());
             formData.append('description', $(".description_old").val());
             formData.append('files', $("#image_new")[0].files[0]);
@@ -85,7 +88,7 @@ $(document).ready(function () {
                     if (res.type == 'success') {
                         $("#editPostModal").modal('toggle');
                         toastr.success("Post Edited");
-                        $(`#${res.id}`).load('/' + ` #${res.id} > *`, function (data) {
+                        $(`#p${res.id}`).load('/' + ` #p${res.id} > *`, function (data) {
                         });
                     }
                     else {

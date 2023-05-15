@@ -1,5 +1,6 @@
 $(document).ready(function () {
     $(document).on("click", ".save-btn", function () {
+        
         $.ajax({
             type: "post",
             url: '/posts/save',
@@ -7,16 +8,22 @@ $(document).ready(function () {
                 postId: $(this).data("postid")
             },
             success: function (res) {
-                console.log("FILTER WILL BE APPLIED");
+                let url = '?'
                 var filter = $(".filter").val();
+                if (filter == "arch") {
+                    url += `arch=1&`
+                }
+                else {
+                    url += `filter=${filter}&`
+                }
                 if (res.type == 'success') {
                     toastr.success(res.message);
-                    $(`#${res.id}`).load(`/?filter=${filter}` + ` #${res.id} > *`, function (data) {
+                    $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
                     });
                 }
                 else {
                     toastr.warning(res.message);
-                    $(`#listPost`).load(`/?filter=${filter}` + ` #listPost > *`, function (data) {
+                    $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
                     });
                 }
             },

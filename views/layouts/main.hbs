@@ -17,8 +17,7 @@
   {{{body}}}
   {{!--
   <script src="/javascripts/posts/archive.js"></script> --}}
-  {{!--
-  <script src="/javascripts/posts/edit.js"></script> --}}
+  <script src="/javascripts/posts/edit.js"></script>
   {{!--
   <script src="/javascripts/posts/filter.js"></script> --}}
   {{!--
@@ -31,9 +30,12 @@
     var socket = io({
       query: { "RoomID": "{{user._id}}" }
     });
-    socket.on("userName", (data) => {
+    socket.on("liked", (data) => {
       toastr.success(data.userNAME + ' Liked Your Post');
     });
+    socket.on("saved", (data) => {
+      toastr.success(data.userNAME + ' saved Your Post');
+    })
     $(document).ready(function () {
       $.ajax({
         type: "get",

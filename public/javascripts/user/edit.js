@@ -70,7 +70,6 @@ $(document).ready(function () {
                 success: async function (res) {
                     if (res.type == 'success') {
                         let url = '/?';
-
                         var filter = $(".filter").val();
                         if (filter == "arch") {
                             url += `arch=1&`
@@ -80,14 +79,22 @@ $(document).ready(function () {
                         }
                         $('#editModal').modal('toggle');
                         toastr.success("User's Details edited");
+                        window.location.href = `/?url`;
+                        // window.location.replace(`/?url`);
 
-                        // $(".user-details").load(`${url}` + ' .user-details > *', function (data) {
+                        // $("#user-details").load(`/login` + ' #user-details > *', function (data) {
+                        //     console.log("data");    
+                        //     console.log(data);
+                        //     console.log("data");
                         // });
                         // setInterval(function () {
-                        //     $(".user-details").load(`${url}` + " .user-details>*", "");
+                        //     $("#listPost").load(`${url}` + ' #listPost > *', function (data) {
+                        //     });
+                        //     // $(".user-details").load(`${url}` + " .user-details>*", function (data) {
+                        //     // });
                         // }, 1000);
-                        $("#listPost").load(`${url}` + ' #listPost > *', function (data) {
-                        });
+                        // alert(url);
+
 
 
                         // alert("Profile edited successfully");

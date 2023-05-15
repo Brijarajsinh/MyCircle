@@ -7,22 +7,23 @@ $(document).ready(function () {
                 postId: $(this).data("postid")
             },
             success: function (res) {
+                let url = '?'
                 var filter = $(".filter").val();
                 if (filter == "arch") {
-                    url = `arch=1&`
+                    url += `arch=1&`
                 }
-                // else {
+                else {
                 url += `filter=${filter}&`
-                // }
+                }
                 console.log(url);
                 if (res.type == 'success') {
                     toastr.warning(res.message);
-                    $(`#listPost`).load(`/` + ` #listPost > *`, function (data) {
+                    $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
                     });
                 }
                 else {
                     toastr.success(res.message);
-                    $(`#listPost`).load(`/?${url}` + ` #listPost > *`, function (data) {
+                    $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
                     });
                 }
             },

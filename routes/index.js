@@ -238,7 +238,7 @@ router.get('/', function (req, res, next) {
               $match:
               {
                 $expr: {
-                  $and:
+                    $and:
                     [
                       { $eq: ["$postID", "$$postID"] },
                       { $eq: ["$userID", userId] }
@@ -248,6 +248,25 @@ router.get('/', function (req, res, next) {
             }
           ],
           as: "liked"
+        }
+      },{
+        $lookup: {
+          from: "likedposts",
+          let: { postID: "$_id" },
+          pipeline: [
+            {
+              $match:
+              {
+                $expr: {
+                    $and:
+                    [
+                      { $eq: ["$postID", "$$postID"] },
+                    ]
+                }
+              }
+            }
+          ],
+          as: "count"
         }
       },
       {
@@ -262,7 +281,8 @@ router.get('/', function (req, res, next) {
           },
           user: { $arrayElemAt: ["$user", 0] },
           saved: { $size: '$saved' },
-          liked: { $size: '$liked' }
+          liked: { $size: '$liked' },
+          likes:{$size:'$count'}
         }
       }, {
         $sort: sort
@@ -281,7 +301,7 @@ router.get('/', function (req, res, next) {
     if (req.xhr) {
       console.log("AJAX called");
       // console.log(page);
-      res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
+      res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics});
     }
     else {
       console.log("AJAX not called");

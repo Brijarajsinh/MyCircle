@@ -61,6 +61,7 @@ router.post('/edit', async function (req, res, next) {
         let post_detail = await PostModel.findOne({ _id: postId });
         let response = {
             type: 'success',
+            id:postId,
             data: post_detail
         }
         res.send(response);
@@ -77,19 +78,20 @@ router.post('/edit', async function (req, res, next) {
 //PUT Route to edit posts contains
 router.put('/', post.single('files'), async function (req, res, next) {
     try {
-        let { postId } = req.body;
+        const postId = new mongoose.Types.ObjectId(req.body.postId);
+        console.log("11111");
         let updated_posts = {
             "title": req.body.title,
             "description": req.body.description
         }
         if (req.file) updated_posts.postImage = req.file.filename;
         await PostModel.updateOne({
-            _id: new mongoose.Types.ObjectId(postId), isArchived: false
+            _id: postId, isArchived: false
         }, { $set: updated_posts });
 
         let response = {
             type: 'success',
-            id:postId
+            id: postId
         }
         res.send(response);
     } catch (error) {
@@ -134,10 +136,21 @@ router.post('/save', async function (req, res, next) {
                 id: postId,
                 message: "Post Saved Successfully"
             }
+            if (createdBy.user_id != req.user._id) {
+                let notificationDetails = new notificationModel({
+                    "userID": new mongoose.Types.ObjectId(createdBy.user_id),
+                    "description": req.user.fname + ' saved your post'
+                });
+                await notificationDetails.save();
+                io.to(createdBy).emit('saved', {
+                    // 'postID': postId,
+                    'userNAME': req.user.fname
+                });
+            }
             res.send(response);
         }
     } catch (error) {
-        console.log("Error generated during user  saves this post")
+        console.log("Error generated during user saves this post")
         console.log(error);
         let response = {
             type: 'error',
@@ -155,7 +168,7 @@ router.post('/like', async function (req, res, next) {
             await likedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
             const response = {
                 type: 'error',
-                id:postId,
+                id: postId,
                 message: "Disliked"
             }
             res.send(response);
@@ -169,7 +182,7 @@ router.post('/like', async function (req, res, next) {
             await likedPostDetails.save();
             const response = {
                 type: 'success',
-                id:postId,
+                id: postId,
                 message: "Liked"
             }
             if (createdBy != req.user._id) {
@@ -178,8 +191,8 @@ router.post('/like', async function (req, res, next) {
                     "description": req.user.fname + ' Liked your post'
                 });
                 await notificationDetails.save();
-                io.to(createdBy).emit('userName', {
-                    'postID': postId,
+                io.to(createdBy).emit('liked', {
+                    // 'postID': postId,
                     'userNAME': req.user.fname
                 });
             }

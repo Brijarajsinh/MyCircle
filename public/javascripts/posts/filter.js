@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     function getURL() {
         let url = '/?';
         let filter = $(".filter").val();
@@ -18,7 +19,10 @@ $(document).ready(function () {
         }
         return url;
     }
-    $(document).on("click", ".pagewise", function () {
+
+    $(".pagewise").unbind('click').on('click', function () {
+
+        // $(document).on("click", ".pagewise", function () {
         // $(".pagewise").unbind().on("click", function () {
         let page = $(this).data("page");
         let url = getURL();
@@ -34,7 +38,7 @@ $(document).ready(function () {
             }
         });
     });
-    $(".search").unbind().on('input', function () {
+    $(".search").unbind('click').on('input', function () {
         $.ajax({
             type: "get",
             url: getURL(),
@@ -83,7 +87,9 @@ $(document).ready(function () {
     //         }
     //     })
     // });
-    $(document).on("click", ".like", function () {
+
+    $('.like').unbind('click').on('click', function () {
+        let _this = this
         $.ajax({
             type: "post",
             url: '/posts/like',
@@ -92,20 +98,25 @@ $(document).ready(function () {
                 createdBy: $(this).data("created")
             },
             success: function (res) {
-                debugger
-                console.log("response");
-                console.log(res);
+                let url = '/?'
                 var filter = $(".filter").val();
-                console.log("filter " + filter);
+                if (filter == "arch") {
+                    url += `arch=1&`
+                }
+                else {
+                    url += `filter=${filter}&`
+                }
+                // alert(url);
                 if (res.type == "success") {
                     toastr.success(res.message);
-                    $(`#${res.id}`).load(`/?filter=${filter}` + ` #${res.id} > *`, function (data) {
-                    });
+                    console.log("54");
+                    // $(`#p${res.id}`).load(`${url}` + ` .likeDetails < #p${res.id} `, function (data) {
+                    // });
                 }
                 else {
                     toastr.error(res.message);
-                    $(`#${res.id}`).load(`/?filter=${filter}` + ` #${res.id} > *`, function (data) {
-                    });
+                    // $(`#p${res.id}`).load(`${url}` + ` .likeDetails < #p${res.id} `, function (data) {
+                    // });
                 }
             },
             error: function (err) {
@@ -114,4 +125,33 @@ $(document).ready(function () {
             }
         });
     })
+
+
+    //$(".like").off('click').on('click', function () {
+    // $(document).unbind("click", ".like").on("click", ".like", function () {
+    //     $.ajax({
+    //         type: "post",
+    //         url: '/posts/like',
+    //         data: {
+    //             postId: $(this).data("postid"),
+    //             createdBy: $(this).data("created")
+    //         },
+    //         success: function (res) {
+    //             if (res.type == "success") {
+    //                 toastr.success(res.message);
+    //                 $(`#p${res.id}`).load(`${getURL()}` + ` #p${res.id} > *`, function (data) {
+    //                 });
+    //             }
+    //             else {
+    //                 toastr.error(res.message);
+    //                 $(`#p${res.id}`).load(`${getURL()}` + ` #p${res.id} > *`, function (data) {
+    //                 });
+    //             }
+    //         },
+    //         error: function (err) {
+    //             console.log(err.toString());
+    //             alert(err.toString());
+    //         }
+    //     });
+    // })
 });
