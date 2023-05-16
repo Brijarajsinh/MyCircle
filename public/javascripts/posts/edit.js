@@ -1,14 +1,10 @@
 $(document).ready(function () {
-
     let currentPostId = null;
-
     $(".closeEditPostModal").on('click', function () {
         $("#editPostModal").modal('toggle');
     });
-    // $(document).unbind().on('click', '.edit-btnn', function () {
-
-        $(".edit-btnn").off('click').on("click", function () {
-        // currentPostId = $(this).data("postid");
+    $(".edit-btnn").unbind().on("click", function () {
+        currentPostId = $(this).data("postid");
         $.ajax({
             type: "post",
             url: '/posts/edit',
@@ -19,9 +15,9 @@ $(document).ready(function () {
                 if (res.type == 'success') {
                     $(".title_old").val(res.data.title);
                     $(".description_old").val(res.data.description);
-                    $(".submit").attr('post',res.id);
+                    $(".submit").attr('post', res.id);
                     $("#editPostModal").modal('show');
-                    currentPostId = res.id; 
+                    currentPostId = res.id;
                 }
                 else {
                     alert(res.message);
@@ -86,10 +82,23 @@ $(document).ready(function () {
                 processData: false,
                 success: function (res) {
                     if (res.type == 'success') {
+                        let url = '/?'
+                        var filter = $(".filter").val();
+                        if (filter == "arch") {
+                            url += `arch=1&`
+                        }
+                        else {
+                            url += `filter=${filter}&`
+                        }
                         $("#editPostModal").modal('toggle');
                         toastr.success("Post Edited");
-                        $(`#p${res.id}`).load('/' + ` #p${res.id} > *`, function (data) {
-                        });
+                        $(`#t${res.id}`).text($(".title_old").val());
+                        $(`#d${res.id}`).text($(".description_old").val());
+                        if (res.image) {
+                            $(`#i${res.id}`).html(
+                                `<img src=/images/posts/${res.image.postImage} style="height:300px; width:250px" alt="NOT"/>`
+                            );
+                        }
                     }
                     else {
                         alert(res.message);
@@ -102,3 +111,4 @@ $(document).ready(function () {
         }
     });
 });
+

@@ -6,6 +6,7 @@ const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
 const { default: mongoose } = require('mongoose');
 const notificationModel = require('../schema/notificationSchema');
+var mailer = require('../mailer');
 
 
 const md5 = require('md5');
@@ -41,7 +42,7 @@ router.put('/notification', async function (req, res, next) {
   try {
     await notificationModel.updateOne({ "_id": req.body._id }, { $set: { "isSeen": true } });
 
-    let count = await notificationModel.countDocuments({ "userID": req.user._id,"isSeen": false })
+    let count = await notificationModel.countDocuments({ "userID": req.user._id, "isSeen": false })
     let response = {
       type: "success",
       count: count,
@@ -68,7 +69,13 @@ router.get('/login', function (req, res, next) {
     return res.redirect('/');
   }
   else {
-    res.render('login', { title: 'Login', layout: "before-login" });
+    if(req.status == 205){
+      res.render('login', { title: 'Login', layout: "before-login",flag:true });
+    }
+    else{
+      res.render('login', { title: 'Login', layout: "before-login" });
+
+    }
   }
 });
 
@@ -122,6 +129,8 @@ router.get('/', function (req, res, next) {
     let sort = {};
     if (req.query.sort == 'title') {
       sort.title = 1
+      // ,
+      //  sort.collation = { 'locale' : 'en_US' } 
     }
     sort._id = -1;
     let find = {}
@@ -137,13 +146,13 @@ router.get('/', function (req, res, next) {
         {
           "title": {
             $regex: req.query.search
-            , $options: "i"
+            // , $options: "i"
           }
         },
         {
           "description": {
             $regex: req.query.search
-            , $options: "i"
+            // , $options: "i"
           }
         }
       ]
@@ -238,7 +247,7 @@ router.get('/', function (req, res, next) {
               $match:
               {
                 $expr: {
-                    $and:
+                  $and:
                     [
                       { $eq: ["$postID", "$$postID"] },
                       { $eq: ["$userID", userId] }
@@ -249,7 +258,7 @@ router.get('/', function (req, res, next) {
           ],
           as: "liked"
         }
-      },{
+      }, {
         $lookup: {
           from: "likedposts",
           let: { postID: "$_id" },
@@ -258,7 +267,7 @@ router.get('/', function (req, res, next) {
               $match:
               {
                 $expr: {
-                    $and:
+                  $and:
                     [
                       { $eq: ["$postID", "$$postID"] },
                     ]
@@ -282,7 +291,7 @@ router.get('/', function (req, res, next) {
           user: { $arrayElemAt: ["$user", 0] },
           saved: { $size: '$saved' },
           liked: { $size: '$liked' },
-          likes:{$size:'$count'}
+          likes: { $size: '$count' }
         }
       }, {
         $sort: sort
@@ -301,7 +310,7 @@ router.get('/', function (req, res, next) {
     if (req.xhr) {
       console.log("AJAX called");
       // console.log(page);
-      res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics});
+      res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
     }
     else {
       console.log("AJAX not called");
@@ -342,6 +351,21 @@ router.post('/registration', async function (req, res, next) {
       return res.send(response);
     }
     else {
+      var info = mailer.sendMail({
+        from: 'mahidabrijrajsinh2910@gmail.com', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'Registration', // Subject line
+        text: 'Registration Success',
+        html: `<h1>You are registered Successfully<h1><br>
+                      <h3>Remember Your Credentials that is something like this:</h3> <br>
+                      <h4>E-mail ID:->"${req.body.email}"<br>
+                      Password :-> ${req.body.password}</h4><br>
+                      <h1>Thanks For Registration</h1><br>
+                      <a href='http://localhost:3000/verify/?email=${req.body.email}&'>To Verify Your Account Please Click Here</a>
+                      <h4> Click Here To Login:=> http://192.168.1.176:3000/login></h4>`
+      });
+      console.log(`Message Sent SuccessFully`);
+
       var new_user = new UserModel({
         "fname": user_details.fname,
         "lname": user_details.lname,

@@ -19,6 +19,13 @@ $(document).ready(function(){
                     required:'Please Enter Password'
                 }
             },
+            errorPlacement: function (error, element) {
+                if (element.attr('name') == "pswd") {
+                    error.insertAfter("#PasswordError");
+                } else {
+                    error.insertAfter(element);
+                }
+            },
             submitHandler: function (form) {
                 form.submit();
             }

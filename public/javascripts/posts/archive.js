@@ -13,19 +13,16 @@ $(document).ready(function () {
                     url += `arch=1&`
                 }
                 else {
-                url += `filter=${filter}&`
+                    url += `filter=${filter}&`
                 }
                 console.log(url);
                 if (res.type == 'success') {
-                    toastr.warning(res.message);
-                    $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
-                    });
-                }
-                else {
                     toastr.success(res.message);
+                    // $(`#p${res.id}`).remove();
                     $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
                     });
                 }
+
             },
             error: function (err) {
                 console.log(err.toString());

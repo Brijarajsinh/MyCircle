@@ -19,11 +19,7 @@ $(document).ready(function () {
         }
         return url;
     }
-
     $(".pagewise").unbind('click').on('click', function () {
-
-        // $(document).on("click", ".pagewise", function () {
-        // $(".pagewise").unbind().on("click", function () {
         let page = $(this).data("page");
         let url = getURL();
         url += `page=${page}`;
@@ -51,7 +47,6 @@ $(document).ready(function () {
         })
     });
     $(".filter").unbind('change').on('change', function () {
-        // alert(getURL());
         $.ajax({
             type: "get",
             url: getURL(),
@@ -88,8 +83,8 @@ $(document).ready(function () {
     //     })
     // });
 
-    $('.like').unbind('click').on('click', function () {
-        let _this = this
+    $(".like").unbind('click').on('click', function () {
+        var like = $(this).data("likes")
         $.ajax({
             type: "post",
             url: '/posts/like',
@@ -98,25 +93,19 @@ $(document).ready(function () {
                 createdBy: $(this).data("created")
             },
             success: function (res) {
-                let url = '/?'
-                var filter = $(".filter").val();
-                if (filter == "arch") {
-                    url += `arch=1&`
-                }
-                else {
-                    url += `filter=${filter}&`
-                }
-                // alert(url);
                 if (res.type == "success") {
+                    like++;
                     toastr.success(res.message);
-                    console.log("54");
-                    // $(`#p${res.id}`).load(`${url}` + ` .likeDetails < #p${res.id} `, function (data) {
-                    // });
+                    $(`#c${res.id}`).text(`${like} Likes`);
+                    $(`#l${res.id}`).attr('src',"/images/liked.jpeg");
+                    $(`#l${res.id}`).data('likes',like);
                 }
                 else {
+                    like--;
                     toastr.error(res.message);
-                    // $(`#p${res.id}`).load(`${url}` + ` .likeDetails < #p${res.id} `, function (data) {
-                    // });
+                    $(`#c${res.id}`).text(`${like} Likes`);
+                    $(`#l${res.id}`).attr('src',"/images/like.jpeg");
+                    $(`#l${res.id}`).data('likes',like);
                 }
             },
             error: function (err) {
@@ -125,33 +114,5 @@ $(document).ready(function () {
             }
         });
     })
-
-
-    //$(".like").off('click').on('click', function () {
-    // $(document).unbind("click", ".like").on("click", ".like", function () {
-    //     $.ajax({
-    //         type: "post",
-    //         url: '/posts/like',
-    //         data: {
-    //             postId: $(this).data("postid"),
-    //             createdBy: $(this).data("created")
-    //         },
-    //         success: function (res) {
-    //             if (res.type == "success") {
-    //                 toastr.success(res.message);
-    //                 $(`#p${res.id}`).load(`${getURL()}` + ` #p${res.id} > *`, function (data) {
-    //                 });
-    //             }
-    //             else {
-    //                 toastr.error(res.message);
-    //                 $(`#p${res.id}`).load(`${getURL()}` + ` #p${res.id} > *`, function (data) {
-    //                 });
-    //             }
-    //         },
-    //         error: function (err) {
-    //             console.log(err.toString());
-    //             alert(err.toString());
-    //         }
-    //     });
-    // })
+    
 });

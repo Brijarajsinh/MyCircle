@@ -61,7 +61,7 @@ router.post('/edit', async function (req, res, next) {
         let post_detail = await PostModel.findOne({ _id: postId });
         let response = {
             type: 'success',
-            id:postId,
+            id: postId,
             data: post_detail
         }
         res.send(response);
@@ -79,12 +79,13 @@ router.post('/edit', async function (req, res, next) {
 router.put('/', post.single('files'), async function (req, res, next) {
     try {
         const postId = new mongoose.Types.ObjectId(req.body.postId);
-        console.log("11111");
         let updated_posts = {
             "title": req.body.title,
             "description": req.body.description
         }
-        if (req.file) updated_posts.postImage = req.file.filename;
+        if (req.file) {
+            updated_posts.postImage = req.file.filename;
+        }
         await PostModel.updateOne({
             _id: postId, isArchived: false
         }, { $set: updated_posts });
@@ -92,6 +93,9 @@ router.put('/', post.single('files'), async function (req, res, next) {
         let response = {
             type: 'success',
             id: postId
+        }
+        if (req.file) {
+            response.image = updated_posts
         }
         res.send(response);
     } catch (error) {
@@ -169,6 +173,7 @@ router.post('/like', async function (req, res, next) {
             const response = {
                 type: 'error',
                 id: postId,
+                createdBy: createdBy,
                 message: "Disliked"
             }
             res.send(response);
@@ -183,6 +188,7 @@ router.post('/like', async function (req, res, next) {
             const response = {
                 type: 'success',
                 id: postId,
+                createdBy: createdBy,
                 message: "Liked"
             }
             if (createdBy != req.user._id) {
@@ -219,7 +225,7 @@ router.delete('/', async function (req, res, next) {
         if (archived) {
             await PostModel.updateOne({ _id: postId }, { isArchived: false });
             let response = {
-                type: 'error',
+                type: 'success',
                 id: postId,
                 message: 'Post Remove from Archive list'
             }

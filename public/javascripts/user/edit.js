@@ -80,32 +80,12 @@ $(document).ready(function () {
                         $('#editModal').modal('toggle');
                         toastr.success("User's Details edited");
                         window.location.href = `/?url`;
-                        // window.location.replace(`/?url`);
-
-                        // $("#user-details").load(`/login` + ' #user-details > *', function (data) {
-                        //     console.log("data");    
-                        //     console.log(data);
-                        //     console.log("data");
-                        // });
-                        // setInterval(function () {
-                        //     $("#listPost").load(`${url}` + ' #listPost > *', function (data) {
-                        //     });
-                        //     // $(".user-details").load(`${url}` + " .user-details>*", function (data) {
-                        //     // });
-                        // }, 1000);
-                        // alert(url);
-
-
-
-                        // alert("Profile edited successfully");
-                        //  window.location.reload();
                     }
                     else {
                         alert(res.message);
                     }
                 },
                 error: function (err) {
-                    // alert("Please Upload .jpg,.jpeg or .png file");
                     console.log(err.toString());
                 }
             })

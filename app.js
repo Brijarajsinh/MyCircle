@@ -57,11 +57,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/verify', require('./routes/verify'));
 
 auth.login(app);
 
 app.use(flash());
-
 app.use((req, res, next) => {
   if (req.user) {
     res.locals.user = req.user;

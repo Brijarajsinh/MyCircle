@@ -6,7 +6,7 @@
                 style="background-image: url(/images/user_images/{{user.profile}}); border-radius: 50%; text-align: start;">
             </div>
             <div class="d-block col">
-                <div>{{title}}</div>
+                <div id="t{{_id}}">{{title}}</div>
                 <div>Post by {{user.fname}} {{user.lname}}</div>
             </div>
             {{#if @root.user._id }}
@@ -23,7 +23,7 @@
                         </svg>
                     </span>
                 </a>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu" >
                     <div class="dropdown-menu-columns">
                         <div class="dropdown-menu-column">
                             {{#compare @root.user._id "==" user_id}}
@@ -37,13 +37,13 @@
                                 id="edit-btn">
                                 Edit Post
                             </a>
-                            <a class="dropdown-item" href="javascript:void(0);" data-postid={{_id}} id="archive-btn">
+                            <a class="dropdown-item dropdownSelection" href="javascript:void(0);" data-postid={{_id}} id="archive-btn">
                                 Archive Post
                             </a>
                             {{/if}}
                             {{/compare}}
                             {{#compare @root.user._id "!=" user_id}}
-                            <a class="dropdown-item save-btn" href="javascript:void(0);" data-postid={{_id}}
+                            <a class="dropdown-item save-btn s{{_id}}" href="javascript:void(0);" data-postid={{_id}}
                                 id="save-btn">
                                 {{#if saved}}Unsave{{else}}Save{{/if}}
                             </a>
@@ -55,7 +55,7 @@
             {{/if}}
         </div>
         <div class="card-body row">
-            <div class="col">
+            <div class="col" id="i{{_id}}">
                 {{#if postImage}}
                 <img src="/images/posts/{{postImage}}" style="height:300px; width:250px" />
                 {{else}}
@@ -64,7 +64,7 @@
             </div>
             <div class="col">
                 <span>Post Description</span>
-                <p class="card-text">{{#if description}}{{description}}{{else}}No Description
+                <p class="card-text" id="d{{_id}}">{{#if description}}{{description}}{{else}}No Description
                     Available{{/if}}</p>
             </div>
         </div>
@@ -78,25 +78,11 @@
                 <p>{{likes}} Likes</p>
             </div>
             {{else}}
-
-            <div class="col-2 text-primary likeDetails">
-                <div class="like avatar avatar-m "
-                    style="background-image: url(/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}); border-radius: 50%; text-align: start;"
-                    data-postid={{_id}} data-created={{user_id}}>
-                </div>
-                <p>{{likes}} Likes</p>
+            <div class="col-2 text-primary " id="{{_id}}">
+                <img class="like" src="/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}" data-postid={{_id}}
+                    data-created={{user_id}} style="height: 50px; width:50px" data-likes={{likes}} id='l{{_id}}'>
+                <p id='c{{_id}}'>{{likes}} Likes</p>
             </div>
-
-            {{!-- <div class="col-2 like" data-postid={{_id}}>
-                <img src="/images/{{#if liked}}like.jpeg{{else}}like.avif{{/if}}" />
-            </div>
-            <div id={{_id}} class="like avatar avatar-m col-2"
-                style="background-image: url(/images/like.avif); border-radius: 50%; text-align: start;"
-                data-postid={{_id}}>
-            </div> --}}
-            {{!-- <div class="col">
-                Comment
-            </div> --}}
             {{/if}}
             {{else}}
             <div class="col-2 text-primary">

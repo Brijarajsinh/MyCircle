@@ -5,7 +5,7 @@ const option = {
 }
 const collation = {
     'locale': 'en_US',
-    'strength': 1,
+    'strength': 1
   }
 const postSchema = new mongoose.Schema({
     title:{
