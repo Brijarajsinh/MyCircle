@@ -56,9 +56,9 @@ $(document).ready(function () {
         },
         submitHandler: function () {
             var formData = new FormData();
-            formData.append('fname', $("#fname").val());
-            formData.append('lname', $("#lname").val());
-            formData.append('email', $("#email").val());
+            formData.append('fname', $("#fname").val().trim());
+            formData.append('lname', $("#lname").val().trim());
+            formData.append('email', $("#email").val().trim());
             formData.append('gender', $('input[type=radio]').val());
             formData.append('files', $("#file")[0].files[0]);
             $.ajax({

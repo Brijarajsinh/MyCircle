@@ -57,10 +57,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/verify', require('./routes/verify'));
-
 auth.login(app);
-
 app.use(flash());
 app.use((req, res, next) => {
   if (req.user) {
@@ -85,15 +82,10 @@ app.use((req, res, next) => {
 app.use('/', require('./routes/index'));
 app.use(auth.commonMiddleware);
 app.use('/posts', require('./routes/posts'));
-
-// app.use(function (req, res, next) {
-//   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-//   next();
-// });
 app.use('/report', require('./routes/report'));
+app.use('/messages',require('./routes/message'))
 // app.use('/save',require('./routes/savedPost'));
 app.use('/users', require('./routes/users'));
-
 var cron = require('node-cron');
 
 cron.schedule('*/1 * * * * *', async function (req, res) {

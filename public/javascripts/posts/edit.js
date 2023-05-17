@@ -71,8 +71,8 @@ $(document).ready(function () {
         submitHandler: function () {
             var formData = new FormData();
             formData.append('postId', $(".submit").attr("post"));
-            formData.append('title', $(".title_old").val());
-            formData.append('description', $(".description_old").val());
+            formData.append('title', $(".title_old").val().trim());
+            formData.append('description', $(".description_old").val().trim());
             formData.append('files', $("#image_new")[0].files[0]);
             $.ajax({
                 type: "put",

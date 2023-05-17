@@ -29,19 +29,24 @@ var post = multer({
 // POST Route to Save the POST in post collection
 router.post('/', post.single('files'), async function (req, res, next) {
     try {
-        let post_details = new PostModel({
-            "title": req.body.title,
-            "description": req.body.description,
-            "user_id": req.user._id
-        })
-        if (req.file) {
-            post_details.postImage = req.file.filename;
+        if (req.user.isVerified == false) {
+            throw "You Are Not Verified, Please verify First....(Check Your Inbox to verify)"
         }
-        await post_details.save();
-        let response = {
-            type: 'success'
+        else {
+            let post_details = new PostModel({
+                "title": req.body.title,
+                "description": req.body.description,
+                "user_id": req.user._id
+            })
+            if (req.file) {
+                post_details.postImage = req.file.filename;
+            }
+            await post_details.save();
+            let response = {
+                type: 'success'
+            }
+            res.send(response);
         }
-        res.send(response);
     } catch (error) {
         console.log("Error Generated IN post process")
         console.log(error);

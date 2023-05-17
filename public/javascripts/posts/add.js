@@ -8,17 +8,6 @@ $(document).ready(function () {
         $("#addPost").modal('toggle');
     });
 
-
-    // $("#image").on('change', function () {
-    //     var file = this.files[0];
-    //     if (Math.round(file.size / (1024 * 1024)) > 2) { // make it in MB so divide by 1024*1024
-    //         alert('Please select image size less than 2 MB');
-    //         $("#image").val("");
-    //         return true;
-    //     }
-    // });
-
-
     $.validator.addMethod('filesize', function (value, element, param) {
         return this.optional(element) || (element.files[0].size <= param * 1000000)
     }, 'File size must be less than {2} MB');
@@ -35,7 +24,7 @@ $(document).ready(function () {
             },
             "image": {
                 extension: "gif|jpeg|png|jpg",
-                filesize:2
+                filesize: 2
             }
         },
         messages: {
@@ -48,7 +37,7 @@ $(document).ready(function () {
             },
             "image": {
                 extension: "Please select .gif , .png or .jpeg/.jpg file",
-                filesize:"File must be less than 2 MB"
+                filesize: "File must be less than 2 MB"
             }
         },
         errorPlacement: function (error, element) {
@@ -60,8 +49,8 @@ $(document).ready(function () {
         },
         submitHandler: function () {
             var formData = new FormData();
-            formData.append('title', $("form#addPostForm [name=title]").val());
-            formData.append('description', $("#description").val());
+            formData.append('title', $("form#addPostForm [name=title]").val().trim());
+            formData.append('description', $("#description").val().trim());
             formData.append('files', $("#image")[0].files[0]);
             $.ajax({
                 type: "post",
@@ -72,17 +61,13 @@ $(document).ready(function () {
                 success: function (res) {
                     if (res.type == 'success') {
                         $('#addPost').modal().hide();
-
-                        toastr.success("post added", {timeOut: 3000});
-
-
-                        // toastr.success("post added successfully", {timeOut: 5000});
-                        // $("#listPost").appendChild("<b>Prepended text</b>. ");
-                        // alert("Post added successfully");
+                        alert("Post Added Successfully");
                         window.location.reload();
                     }
                     else {
+                        $('#addPost').modal().hide();
                         alert(res.message);
+                        window.location.href = '/';
                     }
                 },
                 error: function (err) {

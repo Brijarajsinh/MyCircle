@@ -8,7 +8,6 @@ $(document).ready(function () {
         }
         return url;
     }
-
     $(".search_user").unbind().on('input', function () {
         $.ajax({
             type: "get",

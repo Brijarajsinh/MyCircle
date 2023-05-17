@@ -50,24 +50,18 @@ router.put('/', upload.single('files'), async function (req, res, next) {
     try {
         let updated_details = {
             "fname": req.body.fname,
-            "lname": req.body.lname,
-            "email": req.body.email,
+            "lname": req.body.lname,  
             "gender": req.body.gender
         }
         if (req.file) {
             req.session.passport.user.profile = req.body.fname + path.extname(req.file.originalname);
             updated_details.profile = req.body.fname + path.extname(req.file.originalname);
         }
-
         await UserModel.updateOne({ _id: req.user._id }, {
             $set: updated_details
         });
-
-        req.session.passport.user.fname = updated_details.fname;
-        req.session.passport.user.lname = updated_details.lname;
-        req.session.passport.user.email = updated_details.email;
+        req.session.passport.user.fullName = `${updated_details.fname} ${updated_details.lname}`;
         req.session.passport.user.gender = updated_details.gender;
-
         let response = {
             type: 'success'
         }

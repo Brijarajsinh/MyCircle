@@ -12,17 +12,22 @@ router.get('/', async function (req, res, next) {
     find.$or = [
       {
         "fname": {
-          $regex: req.query.search, $options: "i"
+          $regex: req.query.search
         }
       },
       {
         "lname": {
-          $regex: req.query.search, $options: "i"
+          $regex: req.query.search
+        }
+      },
+      {
+        "fullName": {
+          $regex: req.query.search
         }
       },
       {
         "email": {
-          $regex: req.query.search, $options: "i"
+          $regex: req.query.search
         }
       }
     ]
@@ -66,7 +71,7 @@ router.get('/', async function (req, res, next) {
     {
       $project: {
         "_id": 0,
-        "fullName": { $concat: ['$fname', ' ', '$lname'] },
+        "fullName": 1,
         "email": 1,
         "profile": 1,
         "postCount": { $size: "$post" },
@@ -93,7 +98,7 @@ router.get('/', async function (req, res, next) {
       users: user,
       layout: 'blank',
       page: page
-      
+
     });
   }
   else {

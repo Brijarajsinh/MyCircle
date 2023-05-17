@@ -91,7 +91,7 @@ $(document).ready(function () {
             data: {
                 postId: $(this).data("postid"),
                 createdBy: $(this).data("created")
-            },
+            },  
             success: function (res) {
                 if (res.type == "success") {
                     like++;

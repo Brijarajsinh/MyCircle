@@ -12,7 +12,7 @@ $('.likeNotification').on('click', function () {
             }
         },
         error: function (err) {
-            alert(res.message);
+            alert(err.message);
         }
     })
 })

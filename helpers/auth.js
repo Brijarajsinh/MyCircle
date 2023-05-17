@@ -7,7 +7,6 @@ const UserModel = require('../schema/userSchema');
 const md5 = require('md5');
 const { log } = require('handlebars');
 
-
 module.exports = {
   login: function (app) {
     app.use(cookieSession({
@@ -50,7 +49,9 @@ module.exports = {
           gender: 1,
           password: 1,
           email: 1,
-          profile: 1
+          profile: 1,
+          isVerified: 1,
+          fullName:1
         }).lean().then(async function (user) {
           // if user not found
           if (!user) {
@@ -68,14 +69,15 @@ module.exports = {
         });
       }
     ));
-    passport.serializeUser(function (user, done) {
+    passport.serializeUser(function (req, user, done) {
       console.log("serializeUser");
+      console.log(req.user);
       done(null, user);
     });
-    passport.deserializeUser(function (req,user, done) {
+    passport.deserializeUser(function (req, user, done) {
       try {
         console.log("deserializeUser");
-        // console.log(req.user);
+        console.log(req.user);
         done(null, user);
       } catch (error) {
         console.log(error);
@@ -84,8 +86,6 @@ module.exports = {
   },
   commonMiddleware: function (req, res, next) {
     if (req.isAuthenticated()) {
-      // console.log("CURRENT LOGGED IN USER IS:->")
-      // console.log(req.user);
       return next();
     }
     return res.redirect('/login');

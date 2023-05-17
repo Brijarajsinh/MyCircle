@@ -7,13 +7,11 @@ const savedPostModel = require('../schema/savedPost');
 const { default: mongoose } = require('mongoose');
 const notificationModel = require('../schema/notificationSchema');
 var mailer = require('../mailer');
-
-
 const md5 = require('md5');
 const passport = require('passport');
 
 
-//GET API to get all notification of liked posts
+//GET API to get all notification of liked posts and saved posts by other users
 router.get('/notification', async function (req, res, next) {
   try {
     var notification = await notificationModel.find({
@@ -38,7 +36,6 @@ router.get('/notification', async function (req, res, next) {
 
 //PUT API to update notification status from isSeen : false to isSeen : true
 router.put('/notification', async function (req, res, next) {
-
   try {
     await notificationModel.updateOne({ "_id": req.body._id }, { $set: { "isSeen": true } });
 
@@ -60,31 +57,48 @@ router.put('/notification', async function (req, res, next) {
 });
 
 /* GET home page. */
-//GET Route to render LOGIN Page
-router.get('/login', function (req, res, next) {
-  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  next()
-}, function (req, res, next) {
-  if (req.user) {
-    return res.redirect('/');
-  }
-  else {
-    if(req.status == 205){
-      res.render('login', { title: 'Login', layout: "before-login",flag:true });
-    }
-    else{
-      res.render('login', { title: 'Login', layout: "before-login" });
 
-    }
-  }
+
+//GET Route to render LOGIN Page
+router.get('/login',
+//  function (req, res, next) {
+//   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+//   next()
+// },
+ async function (req, res, next) {
+      if (req.user) {
+        res.redirect('/');
+      }
+      else{
+        res.render('login', { title: 'Login', layout: "before-login" });
+      }  
 });
+router.get('/verify', async function (req, res, next) {
+  try {
+      if (req.query.email) {
+          await UserModel.updateOne(
+              { "email": req.query.email },
+              { $set: { "isVerified": true } }
+          );
+          res.redirect('/login');
+      }
+      else {
+          res.send('/');
+      }
+  } catch (error) {
+      console.log(error.toString());
+  }
+})
+
+
 
 //GET Route to render Registration Page
 router.get('/registration', function (req, res, next) {
   res.render('registration', { title: 'Registration', layout: "before-login" });
 });
 
-//GET Route to Logout user
+
+//GET Route to Logout user and clearing student details from browser's cookies
 router.get('/logout', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   next()
@@ -96,6 +110,7 @@ router.get('/logout', function (req, res, next) {
 
 //POST Route to Login Process of user
 router.post('/login', function (req, res, next) {
+  console.log("LOGIN LOGIN LOGIN LOGIN");
   passport.authenticate('local', function (err, user, info) {
     if (err) {
       return next(err)
@@ -111,11 +126,11 @@ router.post('/login', function (req, res, next) {
         return next(err);
       }
       console.log("Log IN Successfully");
-      // user_id:req.user._id,
       res.redirect('/');
     });
   })(req, res, next);
 });
+
 //Displays all the posts
 router.get('/', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
@@ -212,7 +227,7 @@ router.get('/', function (req, res, next) {
                   { $eq: ["$_id", "$$id"] },
               }
             },
-            { $project: { id: 1, _id: 1, fname: 1, lname: 1, profile: 1 } }
+            { $project: { id: 1, _id: 1, fname: 1, lname: 1, profile: 1, fullName: 1 } }
           ],
           as: "user"
         }
@@ -328,6 +343,7 @@ router.get('/', function (req, res, next) {
     res.send(response);
   }
 });
+
 //GET Route to check e-mail field's value is already registered or not
 router.get('/check-email', async function (req, res, next) {
   let condition = {
@@ -338,7 +354,7 @@ router.get('/check-email', async function (req, res, next) {
   return res.send(true);
 });
 
-//POST Route to store user details in collection
+//POST Route to store user details in users collection
 router.post('/registration', async function (req, res, next) {
   try {
     user_details = req.body;
@@ -356,12 +372,12 @@ router.post('/registration', async function (req, res, next) {
         to: req.body.email, // list of receivers
         subject: 'Registration', // Subject line
         text: 'Registration Success',
-        html: `<h1>You are registered Successfully<h1><br>
+        html: `<h1>You are registered Successfully in MyCircle web Application<h1><br>
                       <h3>Remember Your Credentials that is something like this:</h3> <br>
                       <h4>E-mail ID:->"${req.body.email}"<br>
                       Password :-> ${req.body.password}</h4><br>
                       <h1>Thanks For Registration</h1><br>
-                      <a href='http://localhost:3000/verify/?email=${req.body.email}&'>To Verify Your Account Please Click Here</a>
+                      <a href='http://192.168.1.176:3000/verify/?email=${req.body.email}&'>To Verify Your Account Please Click Here</a>
                       <h4> Click Here To Login:=> http://192.168.1.176:3000/login></h4>`
       });
       console.log(`Message Sent SuccessFully`);

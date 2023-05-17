@@ -76,10 +76,10 @@ $(document).ready(function () {
                 data: data,
                 success: function (res) {
                     if (res.type == 'error') {
-                        window.location.href = 'http://localhost:3000/login';
+                        window.location.href = '/login';
                     }
                     else {
-                        window.location.href = "http://localhost:3000/"
+                        window.location.href = "/"
                     }
                 },
                 error: function (err) {
