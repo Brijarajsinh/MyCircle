@@ -25,14 +25,9 @@ var post = multer({
         }
     }
 });
-
 // POST Route to Save the POST in post collection
 router.post('/', post.single('files'), async function (req, res, next) {
     try {
-        if (req.user.isVerified == false) {
-            throw "You Are Not Verified, Please verify First....(Check Your Inbox to verify)"
-        }
-        else {
             let post_details = new PostModel({
                 "title": req.body.title,
                 "description": req.body.description,
@@ -46,7 +41,6 @@ router.post('/', post.single('files'), async function (req, res, next) {
                 type: 'success'
             }
             res.send(response);
-        }
     } catch (error) {
         console.log("Error Generated IN post process")
         console.log(error);
@@ -58,7 +52,6 @@ router.post('/', post.single('files'), async function (req, res, next) {
     }
     res.send();
 });
-
 //POST Route to pre-fill post details while editing the post
 router.post('/edit', async function (req, res, next) {
     try {
@@ -151,8 +144,7 @@ router.post('/save', async function (req, res, next) {
                     "description": req.user.fname + ' saved your post'
                 });
                 await notificationDetails.save();
-                io.to(createdBy).emit('saved', {
-                    // 'postID': postId,
+                io.to(createdBy.user_id.toString()).emit('saved', {
                     'userNAME': req.user.fname
                 });
             }
@@ -203,7 +195,6 @@ router.post('/like', async function (req, res, next) {
                 });
                 await notificationDetails.save();
                 io.to(createdBy).emit('liked', {
-                    // 'postID': postId,
                     'userNAME': req.user.fname
                 });
             }

@@ -5,88 +5,46 @@ const PostModel = require('../schema/postSchema');
 const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
 const { default: mongoose } = require('mongoose');
-const notificationModel = require('../schema/notificationSchema');
 var mailer = require('../mailer');
 const md5 = require('md5');
 const passport = require('passport');
 
 
-//GET API to get all notification of liked posts and saved posts by other users
-router.get('/notification', async function (req, res, next) {
-  try {
-    var notification = await notificationModel.find({
-      "userID": req.user._id,
-      "isSeen": false
-    },
-      {
-        "_id": 1,
-        "description": 1,
-        "isSeen": 1
-      }).lean();
-    res.render("partials/notification", { notifications: notification, layout: 'blank' });
-  }
-  catch (err) {
-    let response = {
-      type: "error",
-      message: err.toString()
-    }
-    res.send(response);
-  }
-})
 
-//PUT API to update notification status from isSeen : false to isSeen : true
-router.put('/notification', async function (req, res, next) {
-  try {
-    await notificationModel.updateOne({ "_id": req.body._id }, { $set: { "isSeen": true } });
 
-    let count = await notificationModel.countDocuments({ "userID": req.user._id, "isSeen": false })
-    let response = {
-      type: "success",
-      count: count,
-      deleted: req.body._id
-    }
-    res.send(response);
-  }
-  catch (err) {
-    let response = {
-      type: "error",
-      message: err.toString()
-    }
-    res.send(response);
-  }
-});
+
 
 /* GET home page. */
 
 
 //GET Route to render LOGIN Page
 router.get('/login',
-//  function (req, res, next) {
-//   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-//   next()
-// },
- async function (req, res, next) {
-      if (req.user) {
-        res.redirect('/');
-      }
-      else{
-        res.render('login', { title: 'Login', layout: "before-login" });
-      }  
-});
+  function (req, res, next) {
+    res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    next()
+  },
+  async function (req, res, next) {
+    if (req.user) {
+      res.redirect('/');
+    }
+    else {
+      res.render('login', { title: 'Login', layout: "before-login" });
+    }
+  });
 router.get('/verify', async function (req, res, next) {
   try {
-      if (req.query.email) {
-          await UserModel.updateOne(
-              { "email": req.query.email },
-              { $set: { "isVerified": true } }
-          );
-          res.redirect('/login');
-      }
-      else {
-          res.send('/');
-      }
+    if (req.query.email) {
+      await UserModel.updateOne(
+        { "email": req.query.email },
+        { $set: { "isVerified": true } }
+      );
+      res.redirect('/login');
+    }
+    else {
+      res.send('/');
+    }
   } catch (error) {
-      console.log(error.toString());
+    console.log(error.toString());
   }
 })
 
@@ -110,7 +68,6 @@ router.get('/logout', function (req, res, next) {
 
 //POST Route to Login Process of user
 router.post('/login', function (req, res, next) {
-  console.log("LOGIN LOGIN LOGIN LOGIN");
   passport.authenticate('local', function (err, user, info) {
     if (err) {
       return next(err)
@@ -142,12 +99,23 @@ router.get('/', function (req, res, next) {
     let skip = (page_skip - 1) * limit
     //SORTING
     let sort = {};
-    if (req.query.sort == 'title') {
-      sort.title = 1
-      // ,
-      //  sort.collation = { 'locale' : 'en_US' } 
+    if (req.query.sortOrder) {
+      if (req.query.sort == 'title') {
+        sort.title = 1
+      }
+      else {
+        sort._id = 1
+      }
     }
-    sort._id = -1;
+    else {
+      if (req.query.sort == 'title') {
+        sort.title = -1
+      }
+      else {
+        sort._id = -1
+      }
+    }
+    // sort.collation = { locale: "en_US", caseFirst: "upper" } 
     let find = {}
     if (req.user) {
       var userId = new mongoose.Types.ObjectId(req.user._id);
@@ -211,7 +179,8 @@ router.get('/', function (req, res, next) {
         $eq: false
       }
     }
-    let posts = await PostModel.aggregate([
+
+    const query = [
       {
         $match: find
       },
@@ -312,11 +281,16 @@ router.get('/', function (req, res, next) {
         $sort: sort
       },
       { $skip: skip },
-      { $limit: limit }
-    ]);
+      { $limit: limit },
+    ]
+    let posts = await PostModel.aggregate(query, { collation: { locale: "en_US", caseFirst: "upper" } });
     let totalPosts = await PostModel.countDocuments(
       find
     );
+
+
+
+
     let pageCount = Math.ceil(totalPosts / limit);
     let page = [];
     for (let i = 1; i <= pageCount; i++) {
@@ -324,11 +298,14 @@ router.get('/', function (req, res, next) {
     }
     if (req.xhr) {
       console.log("AJAX called");
+      // console.log(posts);
       // console.log(page);
       res.render("partials/posts/list", { posts: posts, layout: 'blank', archived: archived, page: page, statistics: statistics });
     }
     else {
       console.log("AJAX not called");
+      // console.log(posts);
+
       // console.log(page);
       // console.log(posts);
       res.render('timeline', { title: 'Timeline', posts: posts, page: page, statistics: statistics });

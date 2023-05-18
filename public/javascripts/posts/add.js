@@ -67,7 +67,7 @@ $(document).ready(function () {
                     else {
                         $('#addPost').modal().hide();
                         alert(res.message);
-                        window.location.href = '/';
+                        window.location.reload();
                     }
                 },
                 error: function (err) {

@@ -15,14 +15,15 @@ $(document).ready(function () {
                 else {
                     url += `filter=${filter}&`
                 }
-                console.log(url);
                 if (res.type == 'success') {
                     toastr.success(res.message);
                     // $(`#p${res.id}`).remove();
                     $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
                     });
                 }
-
+                else{
+                    alert(res.message);
+                }
             },
             error: function (err) {
                 console.log(err.toString());

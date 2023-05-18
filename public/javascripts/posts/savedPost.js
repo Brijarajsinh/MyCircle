@@ -17,22 +17,25 @@ $(document).ready(function () {
                 }
                 if (res.type == 'success') {
                     toastr.success(res.message);
-                    $(`.s${res.id}`).text("Unsave");
-                    // $(`#p${res.id}`).load(`/${url}` + ` #p${res.id} > *`, function (data) {
-                    // });
+                    // $(`.s${res.id}`).text("Unsave");
+                    $(`#p${res.id}`).load(`/${url}` + ` #p${res.id} > *`, function (data) {
+                    });
+                }
+                else if(res.status == 401){
+                    alert(res.message);
+                    window.location.reload();
                 }
                 else {
                     toastr.warning(res.message);
-                    $(`.s${res.id}`).text("Save");
-
-                    // if (filter == "saved") {
-                    //     $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
-                    //     });
-                    // }
-                    // else{
-                    //     $(`#p${res.id}`).load(`/${url}` + ` #p${res.id} > *`, function (data) {
-                    //     });
-                    // }
+                    // $(`.s${res.id}`).text("Save");
+                    if (filter == "saved") {
+                        $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {
+                        });
+                    }
+                    else{
+                        $(`#p${res.id}`).load(`/${url}` + ` #p${res.id} > *`, function (data) {
+                        });
+                    }
                 }
             },
             error: function (err) {

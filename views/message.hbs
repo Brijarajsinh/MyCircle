@@ -1,0 +1,79 @@
+<div class="m-2">
+    <div class="row d-flex justify-content-center">
+        <li class="container card mb-3 nav-item dropdown col-md-3 justify-content-center">
+            <label class="" for="Search">Search USER BY :</label>
+            <input type="text" name="search_user_message" id="search_user_message" class="mb-2 mt-0 search_user_message"
+                placeholder="First Name,Last Name or Full Name">
+        </li>
+    </div>
+</div>
+<div class="row container-fluid">
+    <div class="col-4">
+        <table class="table table-striped">
+            <tbody>
+                {{#each users}}
+                <tr>
+                    <td>
+                        <div class="avatar avatar-m" style="background-image: url(/images/user_images/{{profile}});">
+                        </div>
+                    </td>
+                    <td>
+                        <a href="javascript:void(0);" class="chatting" id="{{_id}}">{{fullName}}</a>
+                    </td>
+                    {{!-- /messages/get/?id={{_id}} --}}
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-8 bg-secondary chatbox" hidden>
+        <div style="height: 680px;">
+            //Messages
+        </div>
+        <div class="row">
+            <input type="text" class="content" style="width:75%">
+            <input type="button" class="send" style="width:25%" value="Send" data-receiver="">
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $(".reported").hide();
+
+        $(".chatting").on('click', function () {
+            $(".chatbox").attr("hidden", false);
+            $(".send").attr("data-receiver", $(this).attr("id"));
+        });
+
+        $(".send").on("click", function () {
+            let content = $(".content").val().trim();
+            let data = { "content": content };
+            data.receiver = $(this).data(userID);
+            $.ajax({
+                type: "post",
+                url: "/messages",
+                data: data,
+                success: function (res) {
+                    if (res.type == 'success') {
+                        toastr.success(res.message);
+                    }
+                    else {
+                        toastr.error(res.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err.toString());
+                }
+            })
+        })
+    });
+
+</script>
+
+
+
+{{!--
+<script src="/javascripts/main.js"></script> --}}

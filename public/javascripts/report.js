@@ -13,7 +13,6 @@ $(document).ready(function () {
             type: "get",
             url:getURL(),
             success: function (res) {
-                console.log(res);
                 $("#report").html(res);
             },
             error: function (err) {

@@ -19,6 +19,13 @@
               <option value="title">title</option>
             </select>
           </li>
+          <li class="nav-item dropdown">
+            <label for="sorting">Sort post Order BY:</label>
+            <select class="sortOrder">
+              <option value="">DESCENDING</option>
+              <option value="1">ASCENDING</option>
+            </select>
+          </li>
         </div>
       </div>
       {{#if user}}
@@ -26,7 +33,7 @@
       {{> notification}}
 
       {{/if}}
-  
+
       <div class="nav-item dropdown" id="user-details">
         {{#if user}}
         <a href="javascript:void(0);" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"

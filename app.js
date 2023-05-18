@@ -81,12 +81,30 @@ app.use((req, res, next) => {
 });
 app.use('/', require('./routes/index'));
 app.use(auth.commonMiddleware);
-app.use('/posts', require('./routes/posts'));
 app.use('/report', require('./routes/report'));
-app.use('/messages',require('./routes/message'))
-// app.use('/save',require('./routes/savedPost'));
 app.use('/users', require('./routes/users'));
+
+
+app.use('/messages', require('./routes/message'));
+app.use(function (req, res, next) {
+  if (req.user.isVerified) {
+    next();
+  }
+  else {
+    res.send(
+      {
+        type: 'error',
+        status: 401,
+        message: 'Please Verify First'
+      }
+    );
+  }
+})
+app.use('/notification', require('./routes/notification'));
+app.use('/posts', require('./routes/posts'));
+// app.use('/save',require('./routes/savedPost'));
 var cron = require('node-cron');
+const { type } = require('os');
 
 cron.schedule('*/1 * * * * *', async function (req, res) {
   const totalUser = await userModel.find({});

@@ -35,7 +35,6 @@ router.get('/edit', async function (req, res, next) {
         }
         res.send(response, null, 2);
     } catch (error) {
-        console.log("ERROR GENERATED");
         console.log(error);
         let response = {
             "type": "error",

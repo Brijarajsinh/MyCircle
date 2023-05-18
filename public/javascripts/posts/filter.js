@@ -1,9 +1,9 @@
 $(document).ready(function () {
-
     function getURL() {
         let url = '/?';
         let filter = $(".filter").val();
         let sort = $(".sort").val();
+        let sortOrder = $(".sortOrder").val();
         let search = $(".search").val();
         if (filter == "arch") {
             url += `arch=1&`
@@ -16,6 +16,9 @@ $(document).ready(function () {
         }
         if (search) {
             url += `search=${search}&`
+        }
+        if (sortOrder) {
+            url += `sortOrder=${sortOrder}&`
         }
         return url;
     }
@@ -70,6 +73,21 @@ $(document).ready(function () {
             }
         })
     });
+    $(".sortOrder").unbind('change').on('change', function () {
+        $.ajax({
+            type: "get",
+            url: getURL(),
+            success: function (res) {
+                $("#listPost").html(res);
+            },
+            error: function (err) {
+                console.log(err.toString());
+            }
+        })
+    });
+
+
+
     // $(".order").unbind('change').on('change', function () {
     //     $.ajax({
     //         type: "get",
@@ -91,21 +109,25 @@ $(document).ready(function () {
             data: {
                 postId: $(this).data("postid"),
                 createdBy: $(this).data("created")
-            },  
+            },
             success: function (res) {
                 if (res.type == "success") {
                     like++;
                     toastr.success(res.message);
                     $(`#c${res.id}`).text(`${like} Likes`);
-                    $(`#l${res.id}`).attr('src',"/images/liked.jpeg");
-                    $(`#l${res.id}`).data('likes',like);
+                    $(`#l${res.id}`).attr('src', "/images/liked.jpeg");
+                    $(`#l${res.id}`).data('likes', like);
                 }
-                else {
+                else if(res.status == 401) {
+                    alert(res.message);
+                    window.location.reload();
+                }
+                else{
                     like--;
                     toastr.error(res.message);
                     $(`#c${res.id}`).text(`${like} Likes`);
-                    $(`#l${res.id}`).attr('src',"/images/like.jpeg");
-                    $(`#l${res.id}`).data('likes',like);
+                    $(`#l${res.id}`).attr('src', "/images/like.jpeg");
+                    $(`#l${res.id}`).data('likes', like);
                 }
             },
             error: function (err) {
@@ -114,5 +136,5 @@ $(document).ready(function () {
             }
         });
     })
-    
+
 });

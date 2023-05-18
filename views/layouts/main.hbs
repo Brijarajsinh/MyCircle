@@ -71,16 +71,11 @@
     var socket = io({
       query: { "RoomID": "{{user._id}}" }
     });
-    socket.on("liked", (data) => {
-      toastr.success(data.userNAME + ' Liked Your Post');
-    });
-    socket.on("saved", (data) => {
-      toastr.success(data.userNAME + ' saved Your Post');
-    })
-    $(document).ready(function () {
+    function getNotification() {
       $.ajax({
         type: "get",
         url: '/notification',
+        async: true,
         success: function (res) {
           $('#notification').html(res);
         },
@@ -88,8 +83,19 @@
           alert(res.message);
         }
       })
+    }
+    socket.on("liked", (data) => {
+      getNotification();
+      toastr.success(data.userNAME + ' Liked Your Post');
+    });
+    socket.on("saved", (data) => {
+      getNotification();
+      toastr.success(data.userNAME + ' saved Your Post');
     })
-
+    $(document).ready(function(){
+      getNotification();
+    }
+    )
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"
     integrity="sha512-rstIgDs0xPgmG6RX1Aba4KV5cWJbAMcvRCVmglpam9SoHZiUCyQVDdH2LPlxoHtrv17XWblE/V/PP+Tr04hbtA=="

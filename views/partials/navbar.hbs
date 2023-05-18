@@ -23,11 +23,14 @@
               Report
             </a>
           </li>
-
-          {{> message}}
-          
+          <li class="nav-item dropdown">
+            <a href="/messages" class="nav-link px-0">
+              <h1 class="badge bg-red">{{messages.length}}</h1>
+              Messages
+            </a>
+          </li>
       </div>
     </div>
-</nav>  
+</nav>
 {{/if}}
 {{> posts/add}}

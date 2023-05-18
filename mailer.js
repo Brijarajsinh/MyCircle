@@ -19,7 +19,7 @@ transporter.verify(function (error, success) {
     console.log("Error Generated While Sending E-mail");
     console.log(error);
   } else {
-    console.log("Server is ready to take our messages");
+    console.log("................Server is ready to take our messages..........");
   }
 });
 
