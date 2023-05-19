@@ -19,8 +19,8 @@
                     </td>
                     <td>
                         <a href="javascript:void(0);" class="chatting" id="{{_id}}">{{fullName}}</a>
+                        <h1 class="badge bg-red" id="c{{_id}}" data-count="{{count}}">{{count}}</h1>
                     </td>
-                    {{!-- /messages/get/?id={{_id}} --}}
                 </tr>
                 {{/each}}
             </tbody>
@@ -30,47 +30,79 @@
         <div style="height: 680px;">
             //Messages
         </div>
-        <div class="row">
+        <div class="row message" data-receiver="" id="{{user._id}}">
             <input type="text" class="content" style="width:75%">
-            <input type="button" class="send" style="width:25%" value="Send" data-receiver="">
+            <input type="button" class="send" style="width:25%" value="Send">
         </div>
     </div>
-
 </div>
-
-
 <script>
     $(document).ready(function () {
         $(".reported").hide();
-
+        //getMessageContents(`/messages/get/?opened=1&`);
         $(".chatting").on('click', function () {
             $(".chatbox").attr("hidden", false);
-            $(".send").attr("data-receiver", $(this).attr("id"));
+            $(".chatbox").attr("id", $(this).attr("id"));
+            $(".message").attr("data-receiver", $(this).attr("id"));
+            let countMessage = $(`#message-count`).text();
+            countMessage--;
+            $(`#message-count`).text(countMessage);
+            getMessage(`/messages/get/?receiver=${$(this).attr("id")}&`);
         });
 
+        $(".content").keyup(function (event) {
+            if (event.keyCode === 13) {
+                sendMessage();
+            }
+        });
         $(".send").on("click", function () {
+            sendMessage();
+        });
+        function sendMessage() {
             let content = $(".content").val().trim();
-            let data = { "content": content };
-            data.receiver = $(this).data(userID);
+            if (content) {
+                let data = { "content": content };
+                data.receiver = $(".message").attr("data-receiver");
+                data.sender = $(".message").attr("id");
+                $.ajax({
+                    type: "post",
+                    url: "/messages",
+                    data: data,
+                    success: function (res) {
+                        if (res.type == 'success') {
+                            toastr.success(res.message);
+                        }
+                        else {
+                            toastr.error(res.message);
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err.toString());
+                    }
+                })
+                $(".content").val("");
+            }
+            else {
+                toastr.info("Please Type message...");
+            }
+        };
+
+        function getMessageContents(url) {
             $.ajax({
-                type: "post",
-                url: "/messages",
-                data: data,
+                type: "get",
+                url: url,
+                async: true,
                 success: function (res) {
                     if (res.type == 'success') {
-                        toastr.success(res.message);
-                    }
-                    else {
-                        toastr.error(res.message);
+                        // $("#message-count").text(res.count);
                     }
                 },
                 error: function (err) {
-                    console.log(err.toString());
+                    alert(res.message);
                 }
             })
-        })
+        }
     });
-
 </script>
 
 

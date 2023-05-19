@@ -68,6 +68,7 @@
   <script src="/javascripts/posts/archive.js"></script>
   <script src="/javascripts/posts/edit.js"></script> --}}
   <script>
+
     var socket = io({
       query: { "RoomID": "{{user._id}}" }
     });
@@ -82,18 +83,60 @@
         error: function (err) {
           alert(res.message);
         }
+      });
+    }
+    function getMessage() {
+      $.ajax({
+        type: "get",
+        url: '/messages/get',
+        async: true,
+        success: function (res) {
+          if (res.type == 'success') {
+            $("#message-count").text(res.count);
+          }
+        },
+        error: function (err) {
+          alert(err.message);
+        }
       })
     }
     socket.on("liked", (data) => {
       getNotification();
       toastr.success(data.userNAME + ' Liked Your Post');
     });
+
     socket.on("saved", (data) => {
       getNotification();
       toastr.success(data.userNAME + ' saved Your Post');
     })
-    $(document).ready(function(){
+
+    socket.on("message", (data) => {
+
+      if (window.location.href == `http://localhost:3000/messages`) {
+        if ($(".chatbox").attr("id") == `${data.sender}`) {
+
+        }
+        else {
+          let countMessage = $(`#c${data.sender}`).data('count');
+          countMessage++;
+          $(`#c${data.sender}`).text(countMessage);
+          $(`#c${data.sender}`).data('count', countMessage);
+
+
+          let countMessage1 = $(`#message-count`).text();
+          countMessage1++;
+          $(`#message-count`).text(countMessage1);
+        }
+      }
+      else {
+        let countMessage = $(`#message-count`).text();
+        countMessage++;
+        $(`#message-count`).text(countMessage);
+      }
+    })
+    $(document).ready(function () {
       getNotification();
+      getMessage();
     }
     )
   </script>
