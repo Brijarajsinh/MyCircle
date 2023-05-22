@@ -85,7 +85,6 @@ app.use('/report', require('./routes/report'));
 app.use('/users', require('./routes/users'));
 
 
-app.use('/messages', require('./routes/message'));
 app.use(function (req, res, next) {
   if (req.user.isVerified) {
     next();
@@ -97,9 +96,10 @@ app.use(function (req, res, next) {
         status: 401,
         message: 'Please Verify First'
       }
-    );
-  }
-})
+      );
+    }
+  })
+  app.use('/messages', require('./routes/message'));
 app.use('/notification', require('./routes/notification'));
 app.use('/posts', require('./routes/posts'));
 // app.use('/save',require('./routes/savedPost'));

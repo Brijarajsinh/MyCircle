@@ -111,9 +111,11 @@
     })
 
     socket.on("message", (data) => {
-
       if (window.location.href == `http://localhost:3000/messages`) {
         if ($(".chatbox").attr("id") == `${data.sender}`) {
+          $(".receiver").append(`
+            <p>${data.content}</p>
+          `);
 
         }
         else {
@@ -121,8 +123,6 @@
           countMessage++;
           $(`#c${data.sender}`).text(countMessage);
           $(`#c${data.sender}`).data('count', countMessage);
-
-
           let countMessage1 = $(`#message-count`).text();
           countMessage1++;
           $(`#message-count`).text(countMessage1);

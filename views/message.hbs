@@ -1,12 +1,4 @@
 <div class="m-2">
-    <div class="row d-flex justify-content-center">
-        <li class="container card mb-3 nav-item dropdown col-md-3 justify-content-center">
-            <label class="" for="Search">Search USER BY :</label>
-            <input type="text" name="search_user_message" id="search_user_message" class="mb-2 mt-0 search_user_message"
-                placeholder="First Name,Last Name or Full Name">
-        </li>
-    </div>
-</div>
 <div class="row container-fluid">
     <div class="col-4">
         <table class="table table-striped">
@@ -27,85 +19,22 @@
         </table>
     </div>
     <div class="col-8 bg-secondary chatbox" hidden>
-        <div style="height: 680px;">
-            //Messages
+        <div style="height: 680px;" class="Message_content d-flex">
+
+            <div class="receiver w-50">
+
+            </div>
+
+            <div class="sender w-50">
+
+            </div>
+
         </div>
         <div class="row message" data-receiver="" id="{{user._id}}">
-            <input type="text" class="content" style="width:75%">
+            <input type="text" class="content" style="width:75%" placeholder="Type Message.....">
             <input type="button" class="send" style="width:25%" value="Send">
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function () {
-        $(".reported").hide();
-        //getMessageContents(`/messages/get/?opened=1&`);
-        $(".chatting").on('click', function () {
-            $(".chatbox").attr("hidden", false);
-            $(".chatbox").attr("id", $(this).attr("id"));
-            $(".message").attr("data-receiver", $(this).attr("id"));
-            let countMessage = $(`#message-count`).text();
-            countMessage--;
-            $(`#message-count`).text(countMessage);
-            getMessage(`/messages/get/?receiver=${$(this).attr("id")}&`);
-        });
 
-        $(".content").keyup(function (event) {
-            if (event.keyCode === 13) {
-                sendMessage();
-            }
-        });
-        $(".send").on("click", function () {
-            sendMessage();
-        });
-        function sendMessage() {
-            let content = $(".content").val().trim();
-            if (content) {
-                let data = { "content": content };
-                data.receiver = $(".message").attr("data-receiver");
-                data.sender = $(".message").attr("id");
-                $.ajax({
-                    type: "post",
-                    url: "/messages",
-                    data: data,
-                    success: function (res) {
-                        if (res.type == 'success') {
-                            toastr.success(res.message);
-                        }
-                        else {
-                            toastr.error(res.message);
-                        }
-                    },
-                    error: function (err) {
-                        console.log(err.toString());
-                    }
-                })
-                $(".content").val("");
-            }
-            else {
-                toastr.info("Please Type message...");
-            }
-        };
-
-        function getMessageContents(url) {
-            $.ajax({
-                type: "get",
-                url: url,
-                async: true,
-                success: function (res) {
-                    if (res.type == 'success') {
-                        // $("#message-count").text(res.count);
-                    }
-                },
-                error: function (err) {
-                    alert(res.message);
-                }
-            })
-        }
-    });
-</script>
-
-
-
-{{!--
-<script src="/javascripts/main.js"></script> --}}
+<script src="/javascripts/message.js"></script>

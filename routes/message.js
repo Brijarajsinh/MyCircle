@@ -4,48 +4,50 @@ const UserModel = require('../schema/userSchema');
 const { default: mongoose } = require('mongoose');
 const messagesModel = require('../schema/messagesSchema');
 
-
 router.get('/get', async function (req, res, next) {
     try {
-        let find = {
-            "senderID": new mongoose.Types.ObjectId(req.user._id),
-            "isRead": false
-        }
+        let senderID = new mongoose.Types.ObjectId(req.user._id);
+        let find = {}
         let project = {
             "senderID": 1,
             "receiverID": 1,
             "content": 1,
+            "isRead": 1
         }
         if (req.query.receiver) {
             let receiverID = new mongoose.Types.ObjectId(req.query.receiver);
-            find.receiverID = receiverID;
+            //find.receiverID = receiverID;
+            // find.receiverID = senderID;
+            find["$or"] = [
+                { receiverID: receiverID },
+                { senderID: receiverID }
+            ]
             await messagesModel.updateMany({
-                "senderID": senderID,
-                "receiverID": receiverID
+                "receiverID": senderID,
+                "senderID": receiverID
             },
                 { $set: { isRead: "true" } })
         }
-        // else if (req.query.opened){
-        //     find.
-        // }
-        const query = [
-            {
-                $match: find
-            },
-            {
-                $project: project
-            }
-        ]
-        let result = await messagesModel.aggregate(query);
-        let count = await messagesModel.countDocuments({
-            "receiverID": req.user._id
-        });
+        else {
+            find.receiverID = senderID;
+            find.isRead = false
+        }
+        let result = await messagesModel.find(find, project).sort({ "createdAt": -1 }).lean();
+
+        let count = await messagesModel.countDocuments(find);
+
         let response = {
             type: 'success',
             message: "SUCCESSFULLY FETCHED ALL MESSAGES",
             data: result,
+            currentUSER: req.user._id,
             count: count
         }
+        if (req.query.receiver) {
+            console.log("RESULT RESULT RESULT");
+            console.log(result);
+        }
+
         res.send(response);
     } catch (error) {
         console.log("Error Generated While Fetching Message which are not read yet");
@@ -61,7 +63,7 @@ router.get('/get', async function (req, res, next) {
 router.post('/', async function (req, res, next) {
     try {
         console.log("Message Will store in database soon");
-        const senderID = new mongoose.Types.ObjectId(req.body.sender);
+        const senderID = new mongoose.Types.ObjectId(req.user._id);
         const receiverID = new mongoose.Types.ObjectId(req.body.receiver);
         const content = req.body.content;
 
@@ -74,8 +76,9 @@ router.post('/', async function (req, res, next) {
         await message.save();
         io.to(req.body.receiver.toString()).emit('message', {
             'content': content,
-            'sender': req.body.sender,
-            'receiver': req.body.receiver
+            'sender': req.user._id,
+            'receiver': req.body.receiver,
+            'currentUSER': req.user._id
         });
 
         let response = {
@@ -97,30 +100,14 @@ router.get('/', async function (req, res, next) {
     try {
         let userID = new mongoose.Types.ObjectId(req.user._id);
         let find = {}
-        if (req.query.search) {
-            find.$or = [
-                {
-                    "fname": {
-                        $regex: req.query.search
-                    }
-                },
-                {
-                    "lname": {
-                        $regex: req.query.search
-                    }
-                },
-                {
-                    "fullName": {
-                        $regex: req.query.search
-                    }
-                }
-            ]
+
+        find._id = {
+            $ne: userID
         }
-        else {
-            find._id = {
-                $ne: userID
-            }
-        }
+
+
+        console.log("SEARCH SEARCH SEARCH SEARCH SEARCH SEARCH");
+        console.log(req.query.search);
         find.isVerified = {
             $eq: true
         }
@@ -139,13 +126,16 @@ router.get('/', async function (req, res, next) {
                                     $and:
                                         [
                                             { $eq: ["$receiverID", userID] },
-                                            { $eq: ["$senderID", "$$id"] }
+                                            { $eq: ["$senderID", "$$id"] },
+                                            { $eq: ["isRead", false] }
                                         ]
                                 }
                             }
-                        }],
+                        }
+                    ],
                     as: "message"
-                }
+                },
+
             },
             {
                 $project: {
