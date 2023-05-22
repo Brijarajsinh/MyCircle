@@ -43,11 +43,6 @@ router.get('/get', async function (req, res, next) {
             currentUSER: req.user._id,
             count: count
         }
-        if (req.query.receiver) {
-            console.log("RESULT RESULT RESULT");
-            console.log(result);
-        }
-
         res.send(response);
     } catch (error) {
         console.log("Error Generated While Fetching Message which are not read yet");
@@ -98,73 +93,87 @@ router.post('/', async function (req, res, next) {
 
 router.get('/', async function (req, res, next) {
     try {
-        let userID = new mongoose.Types.ObjectId(req.user._id);
-        let find = {}
+        console.log(req.user);
+        if (req.user.isVerified) {
+            let userID = new mongoose.Types.ObjectId(req.user._id);
+            let find = {}
 
-        find._id = {
-            $ne: userID
-        }
+            find._id = {
+                $ne: userID
+            }
 
 
-        console.log("SEARCH SEARCH SEARCH SEARCH SEARCH SEARCH");
-        console.log(req.query.search);
-        find.isVerified = {
-            $eq: true
-        }
-        let user = await UserModel.aggregate([
-            {
-                $match: find
-            },
-            {
-                $lookup: {
-                    from: "messages",
-                    let: { id: "$_id" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and:
-                                        [
-                                            { $eq: ["$receiverID", userID] },
-                                            { $eq: ["$senderID", "$$id"] },
-                                            { $eq: ["isRead", false] }
-                                        ]
+            console.log("SEARCH SEARCH SEARCH SEARCH SEARCH SEARCH");
+            console.log(req.query.search);
+            find.isVerified = {
+                $eq: true
+            }
+            let user = await UserModel.aggregate([
+                {
+                    $match: find
+                },
+                {
+                    $lookup: {
+                        from: "messages",
+                        let: { id: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and:
+                                            [
+                                                { $eq: ["$receiverID", userID] },
+                                                { $eq: ["$senderID", "$$id"] },
+                                                { $eq: ["isRead", false] }
+                                            ]
+                                    }
                                 }
                             }
-                        }
-                    ],
-                    as: "message"
+                        ],
+                        as: "message"
+                    },
+
                 },
+                {
+                    $project: {
+                        "_id": 1,
+                        "fullName": 1,
+                        "profile": 1,
+                        "count": { $size: "$message" },
+                    }
+                },
+                { $sort: { createdAt: 1 } }
+            ])
+            if (req.xhr) {
+                res.render("partials/message", {
+                    title: 'Messages',
+                    users: user,
+                    layout: 'blank'
 
-            },
-            {
-                $project: {
-                    "_id": 1,
-                    "fullName": 1,
-                    "profile": 1,
-                    "count": { $size: "$message" },
-                }
-            },
-            { $sort: { createdAt: 1 } }
-        ])
-        if (req.xhr) {
-            res.render("partials/message", {
-                title: 'Messages',
-                users: user,
-                layout: 'blank'
-
-            });
+                });
+            }
+            else {
+                res.render('message', {
+                    title: 'Messages',
+                    users: user
+                });
+            }
         }
         else {
-            res.render('message', {
-                title: 'Messages',
-                users: user
-            });
+            res.send({
+                type: 'error'
+            })
         }
     } catch (error) {
         console.log("ERROR GENERATED HERE");
         console.log(error);
+        res.send(
+            {
+                type: 'error',
+                status: 401,
+                message: error.toString()
+            }
+        );
     }
-
 });
 module.exports = router;

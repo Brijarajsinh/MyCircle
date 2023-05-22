@@ -26,7 +26,7 @@ $(document).ready(function () {
                     window.location.reload();
                 }
                 else {
-                    toastr.warning(res.message);
+                    toastr.success(res.message);
                     // $(`.s${res.id}`).text("Save");
                     if (filter == "saved") {
                         $(`#listPost`).load(`/${url}` + ` #listPost > *`, function (data) {

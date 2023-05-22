@@ -66,17 +66,27 @@ $(document).ready(function () {
             success: function (res) {
                 if (res.type == 'success') {
                     $(".receiver").html('');
+                    // $(".Message_content").prepand(`
+                    //     <div class="message_history">
+                    //     </div>
+                    // `);
                     toastr.success("ChatBox Opened");
                     for (let val of res.data) {
                         if (val.senderID == res.currentUSER) {
                             //console.log("SENT MESSAGES " + val.content);
                             $(".sender").prepend(`<p>${val.content}</p>`);
+                            //$(".message_history").append(`<p class="text-right">${val.content}</p>`);
                         }
                         else if (val.receiverID == res.currentUSER) {
                             //console.log("RECEIVED MESSAGES " + val.content);
                             $(".receiver").prepend(`<p>${val.content}</p>`);
+                            //$(".message_history").append(`<p class="text-left">${val.content}</p>`);
+
                         }
                     }
+                }
+                else{
+                    toastr.error(res.message);
                 }
             },
             error: function (err) {

@@ -33,11 +33,21 @@ router.get('/login',
   });
 router.get('/verify', async function (req, res, next) {
   try {
+    console.log("VERIFY CALLED");
     if (req.query.email) {
-      await UserModel.updateOne(
-        { "email": req.query.email },
-        { $set: { "isVerified": true } }
-      );
+      let verifyAttempt = await UserModel.findOne({"email": req.query.email,"isVerified": false},{
+        "verifyAttempt":1
+      });
+      if(verifyAttempt <= 3){
+        verifyAttempt++;
+        await UserModel.updateOne(
+          { "email": req.query.email },
+          { $set: { "isVerified": true,"verifyAttempt": verifyAttempt} }
+        );
+      }
+      else{
+        
+      }
       res.redirect('/login');
     }
     else {
@@ -354,7 +364,7 @@ router.post('/registration', async function (req, res, next) {
                       <h4>E-mail ID:->"${req.body.email}"<br>
                       Password :-> ${req.body.password}</h4><br>
                       <h1>Thanks For Registration</h1><br>
-                      <a href='http://192.168.1.176:3000/verify/?email=${req.body.email}&'>To Verify Your Account Please Click Here</a>
+                      <a href='http://localhost:3000/verify/?email=${req.body.email}&'>To Verify Your Account Please Click Here</a>
                       <h4> Click Here To Login:=> http://192.168.1.176:3000/login></h4>`
       });
       console.log(`Message Sent SuccessFully`);

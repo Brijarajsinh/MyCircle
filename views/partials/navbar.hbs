@@ -24,7 +24,7 @@
             </a>
           </li>
           <li class="nav-item dropdown">
-            <a href="/messages" class="nav-link px-0">
+            <a href="javascript:void(0);" class="nav-link px-0 messageBox">
               <h1 class="badge bg-red" id="message-count"></h1>
               Messages
             </a>
@@ -34,3 +34,19 @@
 </nav>
 {{/if}}
 {{> posts/add}}
+<script>
+  $(document).ready(function () {
+    $(".messageBox").on('click', function () {
+      $.ajax({
+        type: 'get',
+        url: '/messages',
+        success: function (res) {
+          if (res.type == 'error') {
+            toastr.error("You Are Not Verified..");
+
+          }
+        }
+      })
+    })
+  })
+</script>

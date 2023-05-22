@@ -48,4 +48,59 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="viewModal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">View User Details</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="mb-3">
+          <label class="form-label">Profile Picture:-</label><b>
+            {{!-- PROFILE PICTURE --}}
+            <div id="userImage">
+            </div>
+
+        </div>
+        <div class="mb-3">
+          <label class="form-label">First Name:-</label><b>
+
+            <div id="userFname">
+
+            </div>
+
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Last Name:-</label>
+          <div id="userLname">
+
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label row">Email address:-</label>
+          <div id="userEmail" class="col-6">
+
+          </div>
+  <div id="userStatus" class="col-6">
+
+  </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Gender:-</label>
+          <div id="userGender">
+
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <script src="/javascripts/user/edit.js"></script>

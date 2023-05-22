@@ -65,8 +65,8 @@ $(document).ready(function () {
                         window.location.reload();
                     }
                     else {
-                        $('#addPost').modal().hide();
-                        alert(res.message);
+                        // $('#addPost').modal().hide();
+                        alert("You Are Not Verified..");
                         window.location.reload();
                     }
                 },

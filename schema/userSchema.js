@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false,
+    },
+    verifyAttempt:{
+        type:Number,
+        default:0,
+        max:2
     }
 }, option);
 

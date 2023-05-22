@@ -94,6 +94,9 @@
           if (res.type == 'success') {
             $("#message-count").text(res.count);
           }
+          else{
+            toastr(res.message);
+          }
         },
         error: function (err) {
           alert(err.message);
@@ -113,10 +116,10 @@
     socket.on("message", (data) => {
       if (window.location.href == `http://localhost:3000/messages`) {
         if ($(".chatbox").attr("id") == `${data.sender}`) {
-          $(".receiver").append(`
+                           // $(".message_history").append(`<p class="text-left">${data.content}</p>`);
+        $(".receiver").append(`
             <p>${data.content}</p>
           `);
-
         }
         else {
           let countMessage = $(`#c${data.sender}`).data('count');

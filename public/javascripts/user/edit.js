@@ -2,6 +2,37 @@ $(document).ready(function () {
     $(".closeUserEdit").on('click', function () {
         $('#editModal').modal('toggle');
     });
+
+    $("#view").on('click', function () {
+        $.ajax({
+            type: "get",
+            url: '/users/edit',
+            success: function (res) {
+                if (res.type == 'success') {
+                    // alert(res.data.isVerified);userImage
+                    $("#userImage").html(`<img src=/images/user_images/${res.data.profile} />`);
+                    $("#userFname").html(`<h2>${res.data.fname}</h2>`);
+                    $("#userLname").html(`<h2>${res.data.lname}</h2>`);
+                    $("#userEmail").html(`<h2>${res.data.email}</h2>`);
+                    if (res.data.isVerified) {
+                        $("#userStatus").html(`<h2 class=text-info>You Are Verified<h2><img class="rounded-circle" src=/images/verified.jpeg style=height:100px />`)
+                    }
+                    else {
+                        $("#userStatus").html(`<h2 class=text-info>You Are Not Verified<h2><a href=http://localhost:3000/verify/?email=${res.data.email}&><h3 class=text-danger>Click Here to Verify</h3></a>`)
+                    }
+                    $("#userGender").html(`<h2>${res.data.gender}</h2>`);
+                    $('#viewModal').modal('toggle');
+                }
+                else {
+                    alert(res.message);
+                }
+            },
+            error: function (err) {
+                console.log(err.toString());
+            }
+        })
+        $('#viewModal').modal('toggle');
+    })
     $("#edit").on('click', function () {
         $.ajax({
             type: "get",

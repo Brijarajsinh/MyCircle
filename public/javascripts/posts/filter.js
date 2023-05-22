@@ -124,7 +124,7 @@ $(document).ready(function () {
                 }
                 else{
                     like--;
-                    toastr.error(res.message);
+                    toastr.success(res.message);
                     $(`#c${res.id}`).text(`${like} Likes`);
                     $(`#l${res.id}`).attr('src', "/images/like.jpeg");
                     $(`#l${res.id}`).data('likes', like);
