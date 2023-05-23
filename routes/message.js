@@ -93,18 +93,12 @@ router.post('/', async function (req, res, next) {
 
 router.get('/', async function (req, res, next) {
     try {
-        console.log(req.user);
         if (req.user.isVerified) {
             let userID = new mongoose.Types.ObjectId(req.user._id);
             let find = {}
-
             find._id = {
                 $ne: userID
             }
-
-
-            console.log("SEARCH SEARCH SEARCH SEARCH SEARCH SEARCH");
-            console.log(req.query.search);
             find.isVerified = {
                 $eq: true
             }
@@ -144,16 +138,25 @@ router.get('/', async function (req, res, next) {
                 },
                 { $sort: { createdAt: 1 } }
             ])
-            if (req.xhr) {
-                res.render("partials/message", {
-                    title: 'Messages',
-                    users: user,
-                    layout: 'blank'
+            // res.send({
+            //     type: 'success',
+            //     data: user
+            // })
 
-                });
+            // res.render("partials/message", {
+            //     title: 'Messages',
+            //     users: user,
+            //     layout: 'blank'
+            // });
+
+            if (req.xhr) {
+                res.send({
+                    type: 'success',
+                    data: user
+                })
             }
             else {
-                res.render('message', {
+                res.render('partials/message', {
                     title: 'Messages',
                     users: user
                 });

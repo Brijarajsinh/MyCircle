@@ -43,7 +43,7 @@ const hbs = exHbs.create({
     ...helpers,
     dateConvert: function (date1) {
       return moment(date1).format('DD/MM/YYYY, h:mm a');
-    },
+    }
   }
 });
 // view engine setup
@@ -83,8 +83,6 @@ app.use('/', require('./routes/index'));
 app.use(auth.commonMiddleware);
 app.use('/report', require('./routes/report'));
 app.use('/users', require('./routes/users'));
-
-
 app.use('/messages', require('./routes/message'));
 app.use('/notification', require('./routes/notification'));
 app.use('/posts', require('./routes/posts'));

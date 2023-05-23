@@ -43,7 +43,9 @@
         success: function (res) {
           if (res.type == 'error') {
             toastr.error("You Are Not Verified..");
-
+          }
+          else{
+            window.location.href = '/messages'
           }
         }
       })

@@ -1,4 +1,26 @@
+function myFunction() {
+    $('#viewModal').modal('toggle');
+    let email = $(".Resend-mail").attr("id");
+    $.ajax({
+        type: "post",
+        url: `/registration/?email=${email}&verify=1`,
+        success: function (res) {
+            if (res.type == 'error') {
+                toastr.error("Can't Send Mail for verification");
+            }
+            else {
+                toastr.success("Check Your Inbox");
+            }
+        },
+        error: function (err) {
+            console.log(err.toString());
+            
+            
+        }
+    })
+}
 $(document).ready(function () {
+
     $(".closeUserEdit").on('click', function () {
         $('#editModal').modal('toggle');
     });
@@ -9,16 +31,18 @@ $(document).ready(function () {
             url: '/users/edit',
             success: function (res) {
                 if (res.type == 'success') {
-                    // alert(res.data.isVerified);userImage
                     $("#userImage").html(`<img src=/images/user_images/${res.data.profile} />`);
                     $("#userFname").html(`<h2>${res.data.fname}</h2>`);
                     $("#userLname").html(`<h2>${res.data.lname}</h2>`);
                     $("#userEmail").html(`<h2>${res.data.email}</h2>`);
                     if (res.data.isVerified) {
-                        $("#userStatus").html(`<h2 class=text-info>You Are Verified<h2><img class="rounded-circle" src=/images/verified.jpeg style=height:100px />`)
+                        $("#userStatus").html(`<h2 class=text-info>You Are Verified</h2><img class="rounded-circle" src=/images/verified.jpeg style=height:100px />`)
                     }
                     else {
-                        $("#userStatus").html(`<h2 class=text-info>You Are Not Verified<h2><a href=http://localhost:3000/verify/?email=${res.data.email}&><h3 class=text-danger>Click Here to Verify</h3></a>`)
+                            $("#userStatus").html(`<h2 class=text-info>You Are Not Verified</h2>
+                            <button type="button" class="btn btn-primary Resend-mail" onclick="myFunction()" id="${res.data.email}">Resend-mail</button>
+                            `);
+
                     }
                     $("#userGender").html(`<h2>${res.data.gender}</h2>`);
                     $('#viewModal').modal('toggle');
@@ -31,8 +55,8 @@ $(document).ready(function () {
                 console.log(err.toString());
             }
         })
-        $('#viewModal').modal('toggle');
     })
+
     $("#edit").on('click', function () {
         $.ajax({
             type: "get",

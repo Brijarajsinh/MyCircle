@@ -9,13 +9,7 @@ var mailer = require('../mailer');
 const md5 = require('md5');
 const passport = require('passport');
 
-
-
-
-
-
 /* GET home page. */
-
 
 //GET Route to render LOGIN Page
 router.get('/login',
@@ -33,22 +27,13 @@ router.get('/login',
   });
 router.get('/verify', async function (req, res, next) {
   try {
-    console.log("VERIFY CALLED");
     if (req.query.email) {
-      let verifyAttempt = await UserModel.findOne({"email": req.query.email,"isVerified": false},{
-        "verifyAttempt":1
-      });
-      if(verifyAttempt <= 3){
-        verifyAttempt++;
-        await UserModel.updateOne(
-          { "email": req.query.email },
-          { $set: { "isVerified": true,"verifyAttempt": verifyAttempt} }
-        );
-      }
-      else{
-        
-      }
-      res.redirect('/login');
+      await UserModel.updateOne(
+        { "email": req.query.email },
+        { $set: { "isVerified": true } }
+      );
+      req.session.passport.user.isVerified = true;
+      res.render('verifyLogin', { title: 'Verification', layout: 'blank' });
     }
     else {
       res.send('/');
@@ -57,8 +42,6 @@ router.get('/verify', async function (req, res, next) {
     console.log(error.toString());
   }
 })
-
-
 
 //GET Route to render Registration Page
 router.get('/registration', function (req, res, next) {
@@ -315,7 +298,6 @@ router.get('/', function (req, res, next) {
     else {
       console.log("AJAX not called");
       // console.log(posts);
-
       // console.log(page);
       // console.log(posts);
       res.render('timeline', { title: 'Timeline', posts: posts, page: page, statistics: statistics });
@@ -345,51 +327,106 @@ router.get('/check-email', async function (req, res, next) {
 router.post('/registration', async function (req, res, next) {
   try {
     user_details = req.body;
-    let exist = await UserModel.countDocuments({ email: user_details.email });
-    if (exist) {
-      let response = {
-        type: "error",
-        message: "E-mail is already registered"
-      }
-      return res.send(response);
-    }
-    else {
-      var info = mailer.sendMail({
-        from: 'mahidabrijrajsinh2910@gmail.com', // sender address
-        to: req.body.email, // list of receivers
-        subject: 'Registration', // Subject line
-        text: 'Registration Success',
-        html: `<h1>You are registered Successfully in MyCircle web Application<h1><br>
+    function getMail(mail) {
+      from = 'mahidabrijrajsinh2910@gmail.com', // sender address
+        to = `${mail}`, // list of receivers
+        subject = 'Registration', // Subject line
+        text = 'Registration Success',
+        html = `<h1>You are registered Successfully in MyCircle web Application<h1><br>
                       <h3>Remember Your Credentials that is something like this:</h3> <br>
-                      <h4>E-mail ID:->"${req.body.email}"<br>
-                      Password :-> ${req.body.password}</h4><br>
+                      <h4>E-mail ID:->${mail}<br>
                       <h1>Thanks For Registration</h1><br>
-                      <a href='http://localhost:3000/verify/?email=${req.body.email}&'>To Verify Your Account Please Click Here</a>
+                      <a href='http://localhost:3000/verify/?email=${mail}&'>To Verify Your Account Please Click Here</a>
                       <h4> Click Here To Login:=> http://192.168.1.176:3000/login></h4>`
-      });
-      console.log(`Message Sent SuccessFully`);
+      return {
+        from,
+        to,
+        subject,
+        text,
+        html
+      }
+    }
 
-      var new_user = new UserModel({
-        "fname": user_details.fname,
-        "lname": user_details.lname,
-        "email": user_details.email,
-        "gender": user_details.gender,
-        "password": md5(user_details.password),
-        "profile": "default_user.jpg"
-      });
-      await new_user.save();
-      req.logIn(new_user, async function (err) {
-        if (err) {
-          return next(err);
+    function dateCompare(date) {
+      var diff = Math.abs(new Date(date) - new Date());
+      var minutes = Math.floor((diff / 1000) / 60);
+      console.log(minutes);
+      return minutes;
+    }
+
+    if (req.query.verify) {
+      let count = await UserModel.findOne(
+        { email: req.query.email },
+        {
+          "_id": 0,
+          "verifyAttempt": 1,
+          "lastVerifyAttempt": 1
         }
-        console.log("Log IN Successfully");
-        res.locals.user = req.user;
-        // user_id:req.user._id,
+      )
+      let attempt = count.verifyAttempt;
+      attempt++;
+
+      if (attempt > process.env.attemptCount) {
+        res.send({
+          type: 'error'
+        });
+      }
+      else if (dateCompare(count.lastVerifyAttempt) < process.env.minuteCount) {
+        res.send({
+          type: 'error'
+        });
+      }
+      else {
+        var info = mailer.sendMail(getMail(req.query.email));
+        console.log(`Message Sent SuccessFully`);
+        await UserModel.updateOne(
+          { email: req.query.email },
+          {
+            "verifyAttempt": attempt
+          }
+        )
+        req.session.passport.user.verifyAttempt = attempt;
         res.send({
           type: 'success'
         });
-      });
+      }
     }
+    else {
+      let exist = await UserModel.countDocuments({ email: user_details.email });
+      if (exist) {
+        let response = {
+          type: "error",
+          message: "E-mail is already registered"
+        }
+        return res.send(response);
+      }
+      else {
+        var info = mailer.sendMail(getMail(user_details.email));
+        console.log(`Message Sent SuccessFully`);
+
+        var new_user = new UserModel({
+          "fname": user_details.fname,
+          "lname": user_details.lname,
+          "email": user_details.email,
+          "gender": user_details.gender,
+          "password": md5(user_details.password),
+          "profile": "default_user.jpg"
+        });
+        await new_user.save();
+        req.logIn(new_user, async function (err) {
+          if (err) {
+            return next(err);
+          }
+          console.log("Log IN Successfully");
+          res.locals.user = req.user;
+          // user_id:req.user._id,
+          res.send({
+            type: 'success'
+          });
+        });
+      }
+    }
+
 
   }
   catch (error) {

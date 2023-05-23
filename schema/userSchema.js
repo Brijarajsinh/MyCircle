@@ -37,14 +37,18 @@ const userSchema = new mongoose.Schema({
     },
     verifyAttempt:{
         type:Number,
-        default:0,
-        max:2
+        default:1
+    },
+    lastVerifyAttempt:{
+        type:Date
     }
 }, option);
 
 userSchema.pre('save', async function (next) {
     let full_name = `${this.fname} ${this.lname}`;
     this.fullName = full_name;
+    this.lastVerifyAttempt = `${this.createdAt}`;
+    //this.lastVerifyAttempt = new Date();
     next();
 })
 
@@ -52,6 +56,11 @@ userSchema.pre('updateOne', async function (next) {
     if (this._update["$set"].fname && this._update["$set"].lname) {
         let full_name = `${this._update["$set"].fname} ${this._update["$set"].lname}`;
         this._update["$set"].fullName = full_name;
+    }
+    console.log("UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE  UPDATE UPDATE UPDATE UPDATE ");
+    console.log(this._update);
+    if(this._update.verifyAttempt && this._update.$set.isVerified != true){
+        this._update["$set"].lastVerifyAttempt = new Date();
     }
     next();
 })
