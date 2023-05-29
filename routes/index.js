@@ -1,14 +1,22 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const UserModel = require('../schema/userSchema');
 const PostModel = require('../schema/postSchema');
 const statisticsModel = require('../schema/statistics');
 const savedPostModel = require('../schema/savedPost');
 const { default: mongoose } = require('mongoose');
-var mailer = require('../mailer');
-const md5 = require('md5');
+const mailer = require('../mailer');
 const passport = require('passport');
+const getMail = require('../helpers/function');
+const userService = require('../services/user.services');
+const postService = require('../services/post.services');
 
+
+
+//GET Route to render Registration Page
+router.get('/registration', function (req, res, next) {
+  res.render('registration', { title: 'Registration', layout: "before-login" });
+});
 /* GET home page. */
 
 //GET Route to render LOGIN Page
@@ -25,16 +33,24 @@ router.get('/login',
       res.render('login', { title: 'Login', layout: "before-login" });
     }
   });
+
+//Get route to verify user and update status from isVerified false to isVarified true
 router.get('/verify', async function (req, res, next) {
   try {
+
+    //if email pass in query parameter than update in db
     if (req.query.email) {
       await UserModel.updateOne(
         { "email": req.query.email },
         { $set: { "isVerified": true } }
       );
+      //after update in db update browser side stored user-details
       req.session.passport.user.isVerified = true;
+
+      //render middleware page that is Login if not already login otherwise main page
       res.render('verifyLogin', { title: 'Verification', layout: 'blank' });
     }
+    //else send to landing page
     else {
       res.send('/');
     }
@@ -43,13 +59,7 @@ router.get('/verify', async function (req, res, next) {
   }
 })
 
-//GET Route to render Registration Page
-router.get('/registration', function (req, res, next) {
-  res.render('registration', { title: 'Registration', layout: "before-login" });
-});
-
-
-//GET Route to Logout user and clearing student details from browser's cookies
+//GET Route to Logout user and clearing user details from browser's cookies
 router.get('/logout', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   next()
@@ -81,101 +91,32 @@ router.post('/login', function (req, res, next) {
   })(req, res, next);
 });
 
-//Displays all the posts
+//Displays all the posts with sorting,searching and pagination
 router.get('/', function (req, res, next) {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   next()
 }, async function (req, res, next) {
   try {
-    let page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-    let limit = 6;
-    let skip = (page_skip - 1) * limit
-    //SORTING
-    let sort = {};
-    if (req.query.sortOrder) {
-      if (req.query.sort == 'title') {
-        sort.title = 1
-      }
-      else {
-        sort._id = 1
-      }
-    }
-    else {
-      if (req.query.sort == 'title') {
-        sort.title = -1
-      }
-      else {
-        sort._id = -1
-      }
-    }
-    // sort.collation = { locale: "en_US", caseFirst: "upper" } 
-    let find = {}
-    if (req.user) {
-      var userId = new mongoose.Types.ObjectId(req.user._id);
-      var statistics = await statisticsModel.findOne({
+    const page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
+    const limit = 6;
+    const skip = (page_skip - 1) * limit;
+    const userId = req.user
+      //if user logged in than set userId to current logged in user's _id 
+      ? new mongoose.Types.ObjectId(req.user._id)
+
+      //else set userId to blank string
+      : '';
+
+    const statistics = req.user
+      ? await statisticsModel.findOne({
         user_id: userId
-      }).lean();
-    }
-    //SEARCHING Posts by 
-    if (req.query.search) {
-      find.$or = [
-        {
-          "title": {
-            $regex: req.query.search
-            // , $options: "i"
-          }
-        },
-        {
-          "description": {
-            $regex: req.query.search
-            // , $options: "i"
-          }
-        }
-      ]
-    }
-    let archived = false;
+      }).lean()
+      : '';
 
-    //ARCHIVED POSTS only
-    if (req.query.arch) {
-      find.isArchived = {
-        $eq: true
-      }
-      find.user_id = {
-        $eq: userId
-      }
-      archived = true;
-    }
-    else {
-      find.isArchived = {
-        $eq: false
-      }
-    }
-
-    //FILTERING
-    if (req.query.filter == 'others') {
-      find.user_id = {
-        $ne: userId
-      }
-    } else if (req.query.filter == 'minePosts') {
-      find.user_id = {
-        $eq: userId
-      }
-    } else if (req.query.filter == 'saved') {
-      let savedPostIds = await savedPostModel.distinct('postID', {
-        userID: userId
-      });
-      find._id = {
-        $in: savedPostIds
-      }
-    } else if (req.query.filter == 'allPosts') {
-      find.isArchived = {
-        $eq: false
-      }
-    }
 
     const query = [
       {
-        $match: find
+        $match: await postService.findObject(req, userId)
       },
       {
         $lookup: {
@@ -270,22 +211,23 @@ router.get('/', function (req, res, next) {
           liked: { $size: '$liked' },
           likes: { $size: '$count' }
         }
-      }, {
-        $sort: sort
+      },
+      {
+        $sort: postService.sortPost(req.query.sort, req.query.sortOrder)
       },
       { $skip: skip },
       { $limit: limit },
     ]
     let posts = await PostModel.aggregate(query, { collation: { locale: "en_US", caseFirst: "upper" } });
     let totalPosts = await PostModel.countDocuments(
-      find
+      await postService.findObject(req, userId)
     );
 
 
 
 
-    let pageCount = Math.ceil(totalPosts / limit);
-    let page = [];
+    const pageCount = Math.ceil(totalPosts / limit);
+    const page = [];
     for (let i = 1; i <= pageCount; i++) {
       page.push(i);
     }
@@ -305,7 +247,7 @@ router.get('/', function (req, res, next) {
     }
   } catch (error) {
     console.log(error);
-    let response = {
+    const response = {
       type: 'error',
       message: "Error Generated While SHOWING data"
     }
@@ -314,125 +256,61 @@ router.get('/', function (req, res, next) {
 });
 
 //GET Route to check e-mail field's value is already registered or not
+
+//this route is called using jquery validator method of remote
 router.get('/check-email', async function (req, res, next) {
-  let condition = {
+  const condition = {
     email: req.query.email
   }
-  let exist = await UserModel.countDocuments(condition);
+  const exist = await UserModel.countDocuments(condition);
+  //if e-mail is already registered than return false
   if (exist) return res.send(false);
+
+  //else return true
   return res.send(true);
 });
+
 
 //POST Route to store user details in users collection
 router.post('/registration', async function (req, res, next) {
   try {
-    user_details = req.body;
-    function getMail(mail) {
-      from = 'mahidabrijrajsinh2910@gmail.com', // sender address
-        to = `${mail}`, // list of receivers
-        subject = 'Registration', // Subject line
-        text = 'Registration Success',
-        html = `<h1>You are registered Successfully in MyCircle web Application<h1><br>
-                      <h3>Remember Your Credentials that is something like this:</h3> <br>
-                      <h4>E-mail ID:->${mail}<br>
-                      <h1>Thanks For Registration</h1><br>
-                      <a href='http://localhost:3000/verify/?email=${mail}&'>To Verify Your Account Please Click Here</a>
-                      <h4> Click Here To Login:=> http://192.168.1.176:3000/login></h4>`
-      return {
-        from,
-        to,
-        subject,
-        text,
-        html
+    const userDetails = req.body;
+    const exist = await UserModel.countDocuments({ email: userDetails.email });
+    if (exist) {
+      const response = {
+        type: "error",
+        message: "E-mail is already registered"
       }
+      return res.send(response);
     }
+    else {
+      //send mail to register mail address for verification
+      const info = mailer.sendMail(getMail.sendMail(userDetails.email));
+      console.log(`Message Sent SuccessFully`);
 
-    function dateCompare(date) {
-      var diff = Math.abs(new Date(date) - new Date());
-      var minutes = Math.floor((diff / 1000) / 60);
-      console.log(minutes);
-      return minutes;
-    }
+      //creating newUser object which has user details
+      const newUser = await new UserModel(userService.userRegistration(userDetails));;
+      //stores user details in database
+      await newUser.save();
 
-    if (req.query.verify) {
-      let count = await UserModel.findOne(
-        { email: req.query.email },
-        {
-          "_id": 0,
-          "verifyAttempt": 1,
-          "lastVerifyAttempt": 1
+      //after store in db store details in browser's cache and continue in timeline page
+      req.logIn(newUser, async function (err) {
+        if (err) {
+          return next(err);
         }
-      )
-      let attempt = count.verifyAttempt;
-      attempt++;
-
-      if (attempt > process.env.attemptCount) {
-        res.send({
-          type: 'error'
-        });
-      }
-      else if (dateCompare(count.lastVerifyAttempt) < process.env.minuteCount) {
-        res.send({
-          type: 'error'
-        });
-      }
-      else {
-        var info = mailer.sendMail(getMail(req.query.email));
-        console.log(`Message Sent SuccessFully`);
-        await UserModel.updateOne(
-          { email: req.query.email },
-          {
-            "verifyAttempt": attempt
-          }
-        )
-        req.session.passport.user.verifyAttempt = attempt;
+        //set the local variable 'user' to access details of current logged in user
+        console.log("Log IN Successfully");
+        res.locals.user = req.user;
         res.send({
           type: 'success'
         });
-      }
+      });
     }
-    else {
-      let exist = await UserModel.countDocuments({ email: user_details.email });
-      if (exist) {
-        let response = {
-          type: "error",
-          message: "E-mail is already registered"
-        }
-        return res.send(response);
-      }
-      else {
-        var info = mailer.sendMail(getMail(user_details.email));
-        console.log(`Message Sent SuccessFully`);
-
-        var new_user = new UserModel({
-          "fname": user_details.fname,
-          "lname": user_details.lname,
-          "email": user_details.email,
-          "gender": user_details.gender,
-          "password": md5(user_details.password),
-          "profile": "default_user.jpg"
-        });
-        await new_user.save();
-        req.logIn(new_user, async function (err) {
-          if (err) {
-            return next(err);
-          }
-          console.log("Log IN Successfully");
-          res.locals.user = req.user;
-          // user_id:req.user._id,
-          res.send({
-            type: 'success'
-          });
-        });
-      }
-    }
-
-
   }
   catch (error) {
     console.log("Error Generated IN USER entry");
     console.log(error);
-    let response = {
+    const response = {
       type: "error",
       message: error.toString()
     }

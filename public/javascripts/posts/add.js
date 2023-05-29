@@ -1,18 +1,22 @@
 $(document).ready(function () {
 
-    $(".addPostModal").on('click', function () {
-        $("#addPost").modal('show');
+    $(".add-post-modal").on('click', function () {
+        //On Click of Add Post link open a modal
+        $("#add-post").modal('show');
     });
 
-    $(".closeAddPost").on('click', function () {
-        $("#addPost").modal('toggle');
+    $(".close-add-post").on('click', function () {
+        //On Click of close button closes a modal which are opened to post
+        $("#add-post").modal('toggle');
     });
 
     $.validator.addMethod('filesize', function (value, element, param) {
+        //add filesize rule to JqueryValidator which validates user to upload file greater than 2 mb size
         return this.optional(element) || (element.files[0].size <= param * 1000000)
     }, 'File size must be less than {2} MB');
 
-    $("#addPostForm").validate({
+    $("#add-post-form").validate({
+        //using jquery validations, validate user entered data to add a post
         keypress: true,
         rules: {
             "title": {
@@ -40,34 +44,39 @@ $(document).ready(function () {
                 filesize: "File must be less than 2 MB"
             }
         },
+        //errorPlacement function to place error after element, if error generated
         errorPlacement: function (error, element) {
             if (element.attr('name') == "image") {
-                error.insertAfter("#postError");
+                error.insertAfter("#post-error");
             } else {
                 error.insertAfter(element);
             }
         },
         submitHandler: function () {
             var formData = new FormData();
-            formData.append('title', $("form#addPostForm [name=title]").val().trim());
+            //append formData with user entered data to add a post
+            formData.append('title', $("#title").val().trim());
             formData.append('description', $("#description").val().trim());
             formData.append('files', $("#image")[0].files[0]);
             $.ajax({
+                //Ajax request of post method calls `/posts` route to add a post in db
                 type: "post",
                 url: '/posts',
                 data: formData,
                 contentType: false,
                 processData: false,
                 success: function (res) {
+                    //success response of ajax call 
                     if (res.type == 'success') {
-                        $('#addPost').modal().hide();
+                        //if res type is success than close addPost modal and reload the page to show updated post
+                        $('#add-post').modal().hide();
                         alert("Post Added Successfully");
                         window.location.reload();
                     }
                     else {
-                        // $('#addPost').modal().hide();
-                        alert("You Are Not Verified..");
-                        window.location.reload();
+                        //else alerts user that he/she is not verified yet
+                        $("#add-post").modal('toggle');
+                        toastr.error("Please Verify First");
                     }
                 },
                 error: function (err) {

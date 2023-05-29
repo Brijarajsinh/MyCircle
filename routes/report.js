@@ -1,13 +1,17 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const UserModel = require('../schema/userSchema');
 
+//GET Route to show report
 router.get('/', async function (req, res, next) {
-  let find = {}
-  let page_skip = (Number(req.query.page)) ? Number(req.query.page) : 1;
-  let limit = 3;
-  let skip = (page_skip - 1) * limit
 
+  //if req.query.page consists than pagination applies in fetched records
+  const find = {}
+  const pageSkip = (Number(req.query.page)) ? Number(req.query.page) : 1;
+  const limit = 3;
+  const skip = (pageSkip - 1) * limit
+
+//if req.query.search consists value than searching applied in fetched records
   if (req.query.search) {
     find.$or = [
       {
@@ -33,7 +37,8 @@ router.get('/', async function (req, res, next) {
     ]
   }
 
-  let user = await UserModel.aggregate([
+  //user object holds all details of all user except current logged-in user
+  const user = await UserModel.aggregate([
     {
       $match: find
     },
@@ -83,15 +88,20 @@ router.get('/', async function (req, res, next) {
     { $skip: skip },
     { $limit: limit }
   ])
-  let totalUsers = await UserModel.countDocuments(
+
+  //find total count of users
+  const totalUsers = await UserModel.countDocuments(
     find
   );
-  let pageCount = Math.ceil(totalUsers / limit);
-  let page = [];
+
+  //generates pages by dividing total users displayed in one page
+  const pageCount = Math.ceil(totalUsers / limit);
+  const page = [];
   for (let i = 1; i <= pageCount; i++) {
     page.push(i);
   }
 
+  //if this route is called using ajax request than load data through partials
   if (req.xhr) {
     res.render("partials/report", {
       title: 'Report Page',
@@ -101,6 +111,8 @@ router.get('/', async function (req, res, next) {
 
     });
   }
+
+  //otherwise load data through rendering report page
   else {
     res.render('report', {
       title: 'Report Page',

@@ -3,9 +3,6 @@
 
 <head>
   <title>{{title}}</title>
-  {{!--
-  <script src="https://code.jquery.com/jquery-3.6.4.js"></script>
-  --}}
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"
     integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
   <script src="/javascripts/toastr.js"></script>
@@ -43,33 +40,18 @@
       min-height: 100%;
     }
   </style>
-  {{!-- {{> scripts}} --}}
-
-  {{!--
-  <script src="/javascripts/user/edit.js"></script> --}}
-  {{!--
-  <script src="/javascripts/posts/add.js"></script> --}}
 </head>
-{{> scripts}}
 
 <body>
   {{> header}}
   {{> navbar}}
   {{{body}}}
-  {{!--
-  <script src="/javascripts/posts/archive.js"></script> --}}
+
   <script src="/javascripts/posts/edit.js"></script>
-  {{!--
-  <script src="/javascripts/posts/filter.js"></script> --}}
-  {{!--
-  <script src="/javascripts/posts/savedPost.js"></script> --}}
   <link href="/stylesheets/style_login.css" rel="stylesheet" />
-  {{!--
-  <script src="/javascripts/posts/archive.js"></script>
-  <script src="/javascripts/posts/edit.js"></script> --}}
   <script>
 
-    var socket = io({
+    const socket = io({
       query: { "RoomID": "{{user._id}}" }
     });
     function getNotification() {
@@ -88,44 +70,54 @@
     function getMessage() {
       $.ajax({
         type: "get",
-        url: '/messages/get',
+        url: '/messages/',
         async: true,
         success: function (res) {
-          if (res.type == 'success') {
-            $("#message-count").text(res.count);
-          }
-          else{
-            toastr(res.message);
-          }
+          $("#message-count").text(res.count);
         },
         error: function (err) {
-          alert(err.message);
+          alert(err);
         }
       })
     }
     socket.on("liked", (data) => {
       getNotification();
-      toastr.success(data.userNAME + ' Liked Your Post');
+      toastr.success(data.userName + ' Liked Your Post');
     });
 
     socket.on("saved", (data) => {
       getNotification();
-      toastr.success(data.userNAME + ' saved Your Post');
+      toastr.success(data.userName + ' saved Your Post');
     })
 
     socket.on("message", (data) => {
       if (window.location.href == `http://localhost:3000/messages`) {
         if ($(".chatbox").attr("id") == `${data.sender}`) {
-                           // $(".message_history").append(`<p class="text-left">${data.content}</p>`);
-        $(".receiver").append(`
-            <p>${data.content}</p>
-          `);
+          $.ajax({
+            type: 'put',
+            url: `/messages/${data.sender}/read`,
+            success: function (res) {
+              if (res.type == 'success') {
+                $(".chatbox").append(`
+                                      <p align="left">
+                                      ${data.content}
+                                      </p>
+                                    `);
+              }
+              else {
+                toastr.error(res.message);
+              }
+            },
+            error: function (err) {
+              alert(err.message);
+            }
+          });
         }
         else {
-          let countMessage = $(`#c${data.sender}`).data('count');
+          let countMessage = $(`#c-${data.sender}`).data('count');
           countMessage++;
-          $(`#c${data.sender}`).text(countMessage);
-          $(`#c${data.sender}`).data('count', countMessage);
+          $(`#c-${data.sender}`).text(countMessage);
+          $(`#c-${data.sender}`).data('count', countMessage);
           let countMessage1 = $(`#message-count`).text();
           countMessage1++;
           $(`#message-count`).text(countMessage1);
@@ -137,7 +129,8 @@
         $(`#message-count`).text(countMessage);
       }
     })
-    $(document).ready(function () {
+    $(document).ready(function (req, res, next) {
+
       getNotification();
       getMessage();
     }

@@ -1,6 +1,9 @@
 const nodemailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
-let transporter = nodemailer.createTransport(smtpTransport({
+const transporter = nodemailer.createTransport(smtpTransport({
+
+  //creates a smtp connection
+  
   service:'gmail',
   host: "localhost",
   port: 587,

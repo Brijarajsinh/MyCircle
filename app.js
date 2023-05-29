@@ -1,13 +1,12 @@
 require('custom-env').env();
 
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-// const jquery_validation = require('jquery-validation');
-var exHbs = require('express-handlebars');
-var bodyParser = require('body-parser');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const exHbs = require('express-handlebars');
+const bodyParser = require('body-parser');
 const moment = require('moment');
 const helpers = require('handlebars-helpers')();
 
@@ -20,7 +19,6 @@ const statisticsModel = require('./schema/statistics');
 
 //Requiring Flash
 const flash = require('connect-flash');
-// global.md5 = require('md5');
 
 //Requiring AUTH.JS file to authenticate Process
 const auth = require('./helpers/auth');
@@ -28,6 +26,7 @@ const auth = require('./helpers/auth');
 //Declaring some common variable globally so it can use multiple time in different files
 global.mongoose = require("mongoose");
 
+//connecting application with database by requiring connection.js file
 require('./connection')();
 var app = express();
 
@@ -36,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json());
 
 
-//also handlebar's inbuilt helper requires
+//handlebar's inbuilt helper requiring
 const hbs = exHbs.create({
   extname: '.hbs',
   helpers: {
@@ -57,6 +56,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 auth.login(app);
 app.use(flash());
 app.use((req, res, next) => {
@@ -79,15 +79,24 @@ app.use((req, res, next) => {
   }
   return next();
 });
+
+//Landing/timeline page which will access by user without login
+
 app.use('/', require('./routes/index'));
+//commonMiddleware to check user is authenticated 
+
 app.use(auth.commonMiddleware);
+
+
+app.use('/posts', require('./routes/posts'));
 app.use('/report', require('./routes/report'));
 app.use('/users', require('./routes/users'));
 app.use('/messages', require('./routes/message'));
 app.use('/notification', require('./routes/notification'));
-app.use('/posts', require('./routes/posts'));
-// app.use('/save',require('./routes/savedPost'));
-var cron = require('node-cron');
+
+
+//assign cron job which store and update user activity at every Minute 
+const cron = require('node-cron');
 const { type } = require('os');
 
 cron.schedule('*/1 * * * * *', async function (req, res) {

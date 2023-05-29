@@ -12,8 +12,8 @@
             </a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link addPostModal" href="javascript:void(0);">
-              <span class="nav-link-title addPostModal">
+            <a class="nav-link add-post-modal" href="javascript:void(0);">
+              <span class="nav-link-title add-post-modal">
                 Add POST
               </span>
             </a>
@@ -24,7 +24,7 @@
             </a>
           </li>
           <li class="nav-item dropdown">
-            <a href="javascript:void(0);" class="nav-link px-0 messageBox">
+            <a href="javascript:void(0);" class="nav-link px-0 message-box">
               <h1 class="badge bg-red" id="message-count"></h1>
               Messages
             </a>
@@ -36,7 +36,7 @@
 {{> posts/add}}
 <script>
   $(document).ready(function () {
-    $(".messageBox").on('click', function () {
+    $(".message-box").on('click', function () {
       $.ajax({
         type: 'get',
         url: '/messages',

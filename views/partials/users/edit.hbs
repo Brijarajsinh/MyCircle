@@ -1,16 +1,14 @@
-<div class="modal fade" id="editModal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="edit-modal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">Update user Details</h4>
-        {{!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button> --}}
+        
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="EditForm" enctype="multipart/form-data">
+        <form id="edit-form" enctype="multipart/form-data">
           <div class="mb-3">
             <label class="form-label">Profile Picture:-</label><b>
               <input type="file" class="form-control" name="files" id="file">
@@ -40,7 +38,7 @@
             </div>
             <div class="col-6"></div>
             <div class="col-3">
-              <button type="button" class="btn btn-secondary closeUserEdit" data-dismiss="modal">CLOSE</button>
+              <button type="button" class="btn btn-secondary close-user-edit" data-dismiss="modal">CLOSE</button>
             </div>
           </div>
         </form>
@@ -49,7 +47,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="viewModal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="view-modal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog">
 
     <div class="modal-content">
@@ -61,37 +59,34 @@
 
         <div class="mb-3">
           <label class="form-label">Profile Picture:-</label><b>
-            {{!-- PROFILE PICTURE --}}
-            <div id="userImage">
+  
+            <div id="user-image">
             </div>
 
         </div>
         <div class="mb-3">
           <label class="form-label">First Name:-</label><b>
 
-            <div id="userFname">
-
+            <div id="user-fname">
             </div>
 
         </div>
         <div class="mb-3">
           <label class="form-label">Last Name:-</label>
-          <div id="userLname">
-
+          <div id="user-lname">
           </div>
         </div>
         <div class="mb-3">
           <label class="form-label row">Email address:-</label>
-          <div id="userEmail" class="col-6">
+          <div id="user-email" class="col-6">
 
           </div>
-          <div id="userStatus" class="col-6">
+          <div id="user-status" class="col-6">
           </div>
         </div>
         <div class="mb-3">
           <label class="form-label">Gender:-</label>
-          <div id="userGender">
-
+          <div id="user-gender">
           </div>
         </div>
         </form>
@@ -99,7 +94,5 @@
     </div>
   </div>
 </div>
-
-
 
 <script src="/javascripts/user/edit.js"></script>

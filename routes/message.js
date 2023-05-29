@@ -1,42 +1,48 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const UserModel = require('../schema/userSchema');
 const { default: mongoose } = require('mongoose');
 const messagesModel = require('../schema/messagesSchema');
 
-router.get('/get', async function (req, res, next) {
+
+//GET Route to get all messaged
+router.get('/:receiver/get', async function (req, res, next) {
     try {
-        let senderID = new mongoose.Types.ObjectId(req.user._id);
-        let find = {}
-        let project = {
+        const senderID = new mongoose.Types.ObjectId(req.user._id);
+        const find = {}
+        const project = {
             "senderID": 1,
             "receiverID": 1,
             "content": 1,
             "isRead": 1
         }
-        if (req.query.receiver) {
-            let receiverID = new mongoose.Types.ObjectId(req.query.receiver);
-            //find.receiverID = receiverID;
-            // find.receiverID = senderID;
+        if (req.params.receiver) {
+            //if receiver passed in query string than finds only receiver's messages
+            const receiverID = new mongoose.Types.ObjectId(req.params.receiver);
             find["$or"] = [
                 { receiverID: receiverID },
                 { senderID: receiverID }
             ]
+            //at the time of fetching previous messages mark them as read
             await messagesModel.updateMany({
                 "receiverID": senderID,
                 "senderID": receiverID
             },
-                { $set: { isRead: "true" } })
+                { $set: { isRead: "true" } });
         }
         else {
+
+            //if receiver not passed in query string than finds only received messages of current logged in user
             find.receiverID = senderID;
             find.isRead = false
         }
-        let result = await messagesModel.find(find, project).sort({ "createdAt": -1 }).lean();
 
-        let count = await messagesModel.countDocuments(find);
+        //result holds the array of messages
+        const result = await messagesModel.find(find, project).sort({ "createdAt": 1 }).lean();
 
-        let response = {
+        //count consist total number of messges that are unread still now
+        const count = await messagesModel.countDocuments(find);
+        const response = {
             type: 'success',
             message: "SUCCESSFULLY FETCHED ALL MESSAGES",
             data: result,
@@ -47,28 +53,54 @@ router.get('/get', async function (req, res, next) {
     } catch (error) {
         console.log("Error Generated While Fetching Message which are not read yet");
         console.log(error);
-        let response = {
+        const response = {
             type: 'error'
         }
         res.send(response);
     }
 });
 
+//put route to update message flag from isRead false to true
+router.put('/:sender/read', async function (req, res, next) {
+    try {
+
+        const receiverID = new mongoose.Types.ObjectId(req.user._id);
+        const senderID = new mongoose.Types.ObjectId(req.query.sender);
+        //update all received messages of current logged-in user sent by req.query.sender as isRead:true
+        await messagesModel.updateMany({
+            "receiverID": receiverID,
+            "senderID": senderID
+        },
+            { $set: { isRead: "true" } });
+        const response = {
+            type: 'success'
+        }
+        res.send(response);
+    } catch (error) {
+        console.log("Error Generated While updating message flag");
+        res.send({
+            type: 'error',
+            message: error.toString()
+        })
+    }
+})
+
 //POST API to store message in messages collection
 router.post('/', async function (req, res, next) {
     try {
-        console.log("Message Will store in database soon");
         const senderID = new mongoose.Types.ObjectId(req.user._id);
         const receiverID = new mongoose.Types.ObjectId(req.body.receiver);
         const content = req.body.content;
 
-        let message = new messagesModel({
+        const message = new messagesModel({
             "senderID": senderID,
             "receiverID": receiverID,
             "content": content
         });
-
+        //store message-details in db with sender,receiver and content
         await message.save();
+
+        //using socket.io let the receiver know that someone sent message to him/her
         io.to(req.body.receiver.toString()).emit('message', {
             'content': content,
             'sender': req.user._id,
@@ -76,7 +108,7 @@ router.post('/', async function (req, res, next) {
             'currentUSER': req.user._id
         });
 
-        let response = {
+        const response = {
             type: 'success',
             message: 'Message Sent Successfully'
         }
@@ -84,18 +116,19 @@ router.post('/', async function (req, res, next) {
     } catch (error) {
         console.log("Error Generated While Sending Message");
         console, log(error);
-        let response = {
+        const response = {
             type: 'error'
         }
         res.send(response);
     }
 });
 
+//GET Route to get count of all messages and chats if user is verified
 router.get('/', async function (req, res, next) {
     try {
         if (req.user.isVerified) {
-            let userID = new mongoose.Types.ObjectId(req.user._id);
-            let find = {}
+            const userID = new mongoose.Types.ObjectId(req.user._id);
+            const find = {}
             find._id = {
                 $ne: userID
             }
@@ -118,7 +151,7 @@ router.get('/', async function (req, res, next) {
                                             [
                                                 { $eq: ["$receiverID", userID] },
                                                 { $eq: ["$senderID", "$$id"] },
-                                                { $eq: ["isRead", false] }
+                                                { $eq: ["$isRead", false] }
                                             ]
                                     }
                                 }
@@ -138,16 +171,6 @@ router.get('/', async function (req, res, next) {
                 },
                 { $sort: { createdAt: 1 } }
             ])
-            // res.send({
-            //     type: 'success',
-            //     data: user
-            // })
-
-            // res.render("partials/message", {
-            //     title: 'Messages',
-            //     users: user,
-            //     layout: 'blank'
-            // });
 
             if (req.xhr) {
                 res.send({

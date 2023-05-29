@@ -1,12 +1,12 @@
-<div id="listPost" class="row">
+<div id="list-post" class="row">
     {{#each posts}}
-    <div class="col-4 card  mb-3" id="p{{_id}}">
+    <div class="col-4 card  mb-3" id="p-{{_id}}">
         <div class="card-header bg-transparent row">
             <div class="avatar avatar-m col-2"
                 style="background-image: url(/images/user_images/{{user.profile}}); border-radius: 50%; text-align: start;">
             </div>
             <div class="d-block col">
-                <div id="t{{_id}}">{{title}}</div>
+                <div id="t-{{_id}}">{{title}}</div>
                 <div>Post by {{user.fullName}}</div>
             </div>
             {{#if @root.user._id }}
@@ -29,21 +29,21 @@
                             {{#compare @root.user._id "==" user_id}}
 
                             {{#if ../archived}}
-                            <a class="dropdown-item" href="javascript:void(0);" data-postid={{_id}} id="archive-btn">
+                            <a class="dropdown-item" href="javascript:void(0);" data-post-id={{_id}} id="archive-btn">
                                 Remove From Archive
                             </a>
                             {{else}}
-                            <a class="dropdown-item edit-btnn" href="javascript:void(0)" data-postid={{_id}}
+                            <a class="dropdown-item edit-btnn" href="javascript:void(0)" data-post-id={{_id}}
                                 id="edit-btn">
                                 Edit Post
                             </a>
-                            <a class="dropdown-item dropdownSelection" href="javascript:void(0);" data-postid={{_id}} id="archive-btn">
+                            <a class="dropdown-item dropdownSelection" href="javascript:void(0);" data-post-id={{_id}} id="archive-btn">
                                 Archive Post
                             </a>
                             {{/if}}
                             {{/compare}}
                             {{#compare @root.user._id "!=" user_id}}
-                            <a class="dropdown-item save-btn s{{_id}}" href="javascript:void(0);" data-postid={{_id}}
+                            <a class="dropdown-item save-btn s-{{_id}}" href="javascript:void(0);" data-post-id={{_id}}
                                 id="save-btn">
                                 {{#if saved}}Unsave{{else}}Save{{/if}}
                             </a>
@@ -55,7 +55,7 @@
             {{/if}}
         </div>
         <div class="card-body row">
-            <div class="col" id="i{{_id}}">
+            <div class="col" id="i-{{_id}}">
                 {{#if postImage}}
                 <img src="/images/posts/{{postImage}}" style="height:300px; width:250px" />
                 {{else}}
@@ -64,7 +64,7 @@
             </div>
             <div class="col">
                 <span>Post Description</span>
-                <p class="card-text" id="d{{_id}}">{{#if description}}{{description}}{{else}}No Description
+                <p class="card-text" id="d-{{_id}}">{{#if description}}{{description}}{{else}}No Description
                     Available{{/if}}</p>
             </div>
         </div>
@@ -79,9 +79,9 @@
             </div>
             {{else}}
             <div class="col-2 text-primary " id="{{_id}}">
-                <img class="like" src="/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}" data-postid={{_id}}
-                    data-created={{user_id}} style="height: 50px; width:50px" data-likes={{likes}} id='l{{_id}}'>
-                <p id='c{{_id}}'>{{likes}} Likes</p>
+                <img class="like" src="/images/{{#if liked}}liked.jpeg{{else}}like.jpeg{{/if}}" data-post-id={{_id}}
+                    data-created={{user_id}} style="height: 50px; width:50px" data-likes={{likes}} id='l-{{_id}}'>
+                <p id='c-{{_id}}'>{{likes}} Likes</p>
             </div>
             {{/if}}
             {{else}}
@@ -94,28 +94,18 @@
     {{/each}}
     <nav aria-label="Page navigation example">
         <ul class="m-4 pagination justify-content-center">
-            {{!-- <li class="page-item">
-                <a href="javascript:void(0);" aria-label="Previous" class="pagewise page-link" data-page="prev">
-                    PREV
-                </a>
-            </li> --}}
+            
             {{#each page}}
             <li class="page-item">
-                <a class="page-link pagewise" href="javascript:void(0);" data-page={{this}}>{{this}}</a>
+                <a class="page-link page-wise" href="javascript:void(0);" data-page={{this}}>{{this}}</a>
             </li>
             {{/each}}
-            {{!-- <li class="page-item">
-                <a href="javascript:void(0);" aria-label="Next" class="pagewise page-link" data-page="next">
-                    NEXT
-                </a>
-            </li> --}}
+            
         </ul>
     </nav>
 </div>
 {{> posts/edit}}
-{{!-- {{> posts/filter}} --}}
 <script src="/javascripts/posts/filter.js"></script>
+
 <script src="/javascripts/posts/archive.js"></script>
 <script src="/javascripts/posts/savedPost.js"></script>
-{{!--
-<script src="/javascripts/posts/like.js"></script> --}}

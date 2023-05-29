@@ -1,22 +1,22 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const PostModel = require('../schema/postSchema');
 const notificationModel = require('../schema/notificationSchema');
 const savedPostModel = require('../schema/savedPost');
 const likedPostModel = require('../schema/likes');
 const { default: mongoose } = require('mongoose');
 const multer = require('multer');
-var path = require('path');
+const path = require('path');
 const { log } = require('console');
-
+const postService = require('../services/post.services');
 //Storage for user post image
-var post_storage = multer.diskStorage({
+const post_storage = multer.diskStorage({
     destination: 'public/images/posts/',
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
-var post = multer({
+const post = multer({
     storage: post_storage, fileFilter: (req, file, cb) => {
         if (file.mimetype == "image/gif" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
             cb(null, true);
@@ -25,26 +25,35 @@ var post = multer({
         }
     }
 });
+
 // POST Route to Save the POST in post collection
 router.post('/', post.single('files'), async function (req, res, next) {
     try {
-        if(req.user.isVerified){
-            let post_details = new PostModel({
+
+        //if logged-in user is verified than add post in db
+        if (req.user.isVerified) {
+            const postDetails = new PostModel({
                 "title": req.body.title,
                 "description": req.body.description,
                 "user_id": req.user._id
             })
             if (req.file) {
-                post_details.postImage = req.file.filename;
+                //if user wants to add post-image than add image in postDetails object
+                postDetails.postImage = req.file.filename;
             }
-            await post_details.save();
-            let response = {
+
+
+            //save postDetails in db
+            await postDetails.save();
+            const response = {
                 type: 'success'
             }
             res.send(response);
         }
-        else{
-            let response = {
+
+        //else send error
+        else {
+            const response = {
                 type: 'error'
             }
             res.send(response)
@@ -52,7 +61,7 @@ router.post('/', post.single('files'), async function (req, res, next) {
     } catch (error) {
         console.log("Error Generated IN post process")
         console.log(error);
-        let response = {
+        const response = {
             type: 'error',
             message: error.toString()
         }
@@ -60,15 +69,16 @@ router.post('/', post.single('files'), async function (req, res, next) {
     }
     res.send();
 });
+
 //POST Route to pre-fill post details while editing the post
-router.post('/edit', async function (req, res, next) {
+router.get('/:postId/edit', async function (req, res, next) {
     try {
-        const postId = new mongoose.Types.ObjectId(req.body.postId);
-        let post_detail = await PostModel.findOne({ _id: postId });
+        const postId = new mongoose.Types.ObjectId(req.params.postId);
+        const postDetail = await PostModel.findOne({ _id: postId });
         let response = {
             type: 'success',
             id: postId,
-            data: post_detail
+            data: postDetail
         }
         res.send(response);
     } catch (error) {
@@ -81,33 +91,35 @@ router.post('/edit', async function (req, res, next) {
     }
 });
 
-//PUT Route to edit posts contains
-router.put('/', post.single('files'), async function (req, res, next) {
+//PUT Route to edit posts details
+router.put('/:postId/edit', post.single('files'), async function (req, res, next) {
     try {
-        const postId = new mongoose.Types.ObjectId(req.body.postId);
-        let updated_posts = {
+        const postId = new mongoose.Types.ObjectId(req.params.postId);
+        const updatedPost = {
             "title": req.body.title,
             "description": req.body.description
         }
-        if (req.file) {
-            updated_posts.postImage = req.file.filename;
-        }
-        await PostModel.updateOne({
-            _id: postId, isArchived: false
-        }, { $set: updated_posts });
 
-        let response = {
+        const response = {
             type: 'success',
             id: postId
         }
+
         if (req.file) {
-            response.image = updated_posts
+            //if user wants to edit post image add image in updatedPost object
+            updatedPost.postImage = req.file.filename;
+            response.image = updatedPost.postImage
         }
+
+        //update postDetails in collection
+        await PostModel.updateOne({
+            _id: postId, isArchived: false
+        }, { $set: updatedPost });
         res.send(response);
     } catch (error) {
         console.log(error);
         console.log("Error Generated while editing post details");
-        let response = {
+        const response = {
             type: 'error',
             message: error.toString()
         }
@@ -116,11 +128,12 @@ router.put('/', post.single('files'), async function (req, res, next) {
 });
 
 //POST Route to save post by current user
-router.post('/save', async function (req, res, next) {
+router.post('/:postId/save', async function (req, res, next) {
     try {
-        let { postId } = req.body;
+        const postId = req.params.postId;
         const saved = await savedPostModel.countDocuments({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
         if (saved) {
+            //if post is already saved than un-save it and delete from savedPost collection
             await savedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
             const response = {
                 type: 'error',
@@ -130,12 +143,14 @@ router.post('/save', async function (req, res, next) {
             res.send(response);
         }
         else {
-            let createdBy = await PostModel.findOne({
+
+            //Otherwise save post and store in savedPost collection
+            const createdBy = await PostModel.findOne({
                 _id: postId
             }, {
                 "_id": 0, "user_id": 1
             });
-            let savedPostDetails = new savedPostModel({
+            const savedPostDetails = new savedPostModel({
                 "postID": postId,
                 "userID": req.user._id,
                 "createdBy": createdBy.user_id
@@ -146,22 +161,24 @@ router.post('/save', async function (req, res, next) {
                 id: postId,
                 message: "Post Saved Successfully"
             }
-            if (createdBy.user_id != req.user._id) {
-                let notificationDetails = new notificationModel({
-                    "userID": new mongoose.Types.ObjectId(createdBy.user_id),
-                    "description": req.user.fname + ' saved your post'
-                });
-                await notificationDetails.save();
-                io.to(createdBy.user_id.toString()).emit('saved', {
-                    'userNAME': req.user.fname
-                });
-            }
+            const notificationDetails = new notificationModel({
+                "userID": new mongoose.Types.ObjectId(createdBy.user_id),
+                "description": req.user.fname + ' saved your post'
+            });
+
+            //save notification of post save in notification collection
+            await notificationDetails.save();
+
+            //using socket.io send notification to the user that created a post which is saved by current logged-in user
+            io.to(createdBy.user_id.toString()).emit('saved', {
+                'userName': req.user.fname
+            });
             res.send(response);
         }
     } catch (error) {
         console.log("Error generated during user saves this post")
         console.log(error);
-        let response = {
+        const response = {
             type: 'error',
             message: error.toString()
         }
@@ -169,11 +186,15 @@ router.post('/save', async function (req, res, next) {
     }
 })
 
-router.post('/like', async function (req, res, next) {
+
+//POST route to like post
+router.post('/:postId/:createdBy/like', async function (req, res, next) {
     try {
-        let { postId, createdBy } = req.body;
+        let { postId, createdBy } = req.params;
         const liked = await likedPostModel.countDocuments({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
         if (liked) {
+
+            //if post is liked than dislike it and delete from likedPost collection
             await likedPostModel.deleteOne({ postID: { $eq: postId }, userID: { $eq: req.user._id } });
             const response = {
                 type: 'error',
@@ -184,7 +205,9 @@ router.post('/like', async function (req, res, next) {
             res.send(response);
         }
         else {
-            let likedPostDetails = new likedPostModel({
+
+            //else like the post and store in likedPost collection
+            const likedPostDetails = new likedPostModel({
                 "postID": postId,
                 "userID": req.user._id,
                 "createdBy": createdBy
@@ -197,13 +220,16 @@ router.post('/like', async function (req, res, next) {
                 message: "Liked"
             }
             if (createdBy != req.user._id) {
-                let notificationDetails = new notificationModel({
+                const notificationDetails = new notificationModel({
                     "userID": createdBy,
                     "description": req.user.fname + ' Liked your post'
                 });
+                //save details in database
                 await notificationDetails.save();
+
+                //using socket.io let the user that created post which is liked by current logged-in user
                 io.to(createdBy).emit('liked', {
-                    'userNAME': req.user.fname
+                    'userName': req.user.fname
                 });
             }
             res.send(response);
@@ -211,7 +237,7 @@ router.post('/like', async function (req, res, next) {
     }
     catch (error) {
         console.log(error);
-        let response = {
+        const response = {
             type: "error",
             message: error.toString()
         }
@@ -220,24 +246,27 @@ router.post('/like', async function (req, res, next) {
 });
 
 //DELETE Route to archive post
-
-router.delete('/', async function (req, res, next) {
+router.delete('/:postId/archive', async function (req, res, next) {
     try {
-        let { postId } = req.body;
-        postId = new mongoose.Types.ObjectId(postId);
+
+        const postId = new mongoose.Types.ObjectId(req.params.postId);
         const archived = await PostModel.countDocuments({ _id: { $eq: postId }, user_id: { $eq: req.user._id }, "isArchived": true });
         if (archived) {
+            //if post is already archived than remove from archive list by updating in db
+            //from isArchived true to isArchived false
             await PostModel.updateOne({ _id: postId }, { isArchived: false });
-            let response = {
-                type: 'success',
+            const response = {
+                type: 'error',
                 id: postId,
                 message: 'Post Remove from Archive list'
             }
             res.send(response);
         }
         else {
+
+            //else set flag of post isArchived true in database
             await PostModel.updateOne({ _id: postId }, { isArchived: true });
-            let response = {
+            const response = {
                 type: 'success',
                 id: postId,
                 message: 'Post Archived'
@@ -246,7 +275,7 @@ router.delete('/', async function (req, res, next) {
         }
     } catch (error) {
         console.log(error);
-        let response = {
+        const response = {
             type: 'error',
             message: error.toString()
         }

@@ -6,10 +6,10 @@
                 {{#if flash}}
                 <div class="alert alert-danger ">{{flash.message}}</div>
                 {{/if}}
-                <form action="/login" id="LoginForm" method="post">
+                <form action="/login" id="login-form" method="post">
                     <div class="mb-3">
                         <label class="form-label">Email address<sup class="text-danger">*(required)</sup></label>
-                        <input type="email" class="form-control" placeholder="abc@email.com" name="email">
+                        <input type="email" class="form-control" placeholder="abc@gmail.com" name="email">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
@@ -18,7 +18,7 @@
                         <div class="input-group input-group-flat">
                             <input type="password" class="form-control" placeholder="Your password" name="pswd">
                         </div>
-                        <label id="PasswordError"></label>
+                        <label id="password-error"></label>
 
                     </div>
                     <div class="form-footer">

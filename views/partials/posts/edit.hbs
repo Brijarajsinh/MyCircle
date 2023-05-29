@@ -1,4 +1,4 @@
-<div class="modal fade" id="editPostModal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="edit-post-modal" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
@@ -8,22 +8,22 @@
 
             </div>
             <div class="modal-body">
-                <form id="editPostForm" enctype="multipart/form-data">
+                <form id="edit-post-form" enctype="multipart/form-data">
                     {{!-- method="post" action="/users/" --}}
                     <div class="mb-3">
                         <label class="form-label">Title<sup class="text-danger">*(required)</sup></label><b>
-                            <input type="text" class="form-control title_old" placeholder="Title" name="title"
-                                id="title_old" value="" maxlength="30">
+                            <input type="text" class="form-control title-old" placeholder="Title" name="title"
+                                id="title-old" value="" maxlength="30">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="description_old" id="description_old" name="description" rows="6" cols="50"
+                        <textarea class="description-old" id="description-old" name="description" rows="6" cols="50"
                             maxlength="300"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Image</label><b>
-                            <input type="file" class="form-control" name="image_new" id="image_new">
-                            <label id="imageError"></label>
+                            <input type="file" class="form-control" name="image-new" id="image-new">
+                            <label id="image-error"></label>
 
                     </div>
                     <div class="form-footer d-flex row">
@@ -32,7 +32,7 @@
                         </div>
                         <div class="col-6"></div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-secondary closeEditPostModal"
+                            <button type="button" class="btn btn-secondary close-edit-post-modal"
                                 data-dismiss="modal">CLOSE</button>
                         </div>
                     </div>
@@ -41,6 +41,4 @@
         </div>
     </div>
 </div>
-{{!--
-<script src="/javascripts/posts/edit.js"></script> --}}
 <script src="/javascripts/posts/edit.js"></script>

@@ -1,8 +1,12 @@
 $(document).ready(function () {
+
+    //add method to validate password field is strong enough or not
     $.validator.addMethod("strongePassword", function (value) {
         return /^[A-Za-z0-9\d=!\-@._*]*$/.test(value) && /[a-z]/.test(value) && /\d/.test(value) && /[A-Z]/.test(value);
     });
-    $("#RegistrationForm").validate({
+
+    //using jquery validator validate the registration form details which are enterd by user
+    $("#registration-form").validate({
         keypress: true,
         rules: {
             "fname": {
@@ -14,7 +18,7 @@ $(document).ready(function () {
             "email": {
                 required: true,
                 email: true,
-                remote: "check-email"
+                remote: "/check-email"
             },
             "gender": {
                 required: true
@@ -24,9 +28,9 @@ $(document).ready(function () {
                 minlength: 8,
                 strongePassword: true
             },
-            "cpswd": {
+            "confirm-pswd": {
                 required: true,
-                equalTo: "#pswd"
+                equalTo: "#register-password"
             },
         },
         messages: {
@@ -50,35 +54,45 @@ $(document).ready(function () {
                 strongePassword: "(Use a combination of upper case letters, lower case letters, numbers, and special characters for example: !, @, &, %, +)",
                 minlength: 'Password Must contain 8 characters'
             },
-            "cpswd": {
+            "confirm-pswd": {
                 required: 'Confirm Your Password',
                 equalTo: 'Password Not Matched'
             },
         },
+        //if error generated from jquery validator than place that error at specific location
         errorPlacement: function (error, element) {
+
+            //if error generated from gender element than place that error just after gender-error element
             if (element.attr('name') == "gender") {
-                error.insertAfter("#Gendererror");
-            } else {
+                error.insertAfter("#gender-error");
+            }
+            //else place that error just after form which that error is generated
+            else {
                 error.insertAfter(element);
             }
         },
+        //on submit of registration-form validate user entered details using jquery validator
         submitHandler: function () {
-            let data = {
-                fname: $("#rfname").val().trim(),
-                lname: $("#rlname").val().trim(),
-                email: $("#email").val().trim(),
+            //append the user entered details in data object
+            const data = {
+                fname: $("#register-fname").val().trim(),
+                lname: $("#register-lname").val().trim(),
+                email: $("#register-email").val().trim(),
                 gender: $('input[name="gender"]:checked').val(),
-                password: $("#pswd").val(),
+                password: $("#register-password").val(),
             }
+            //an ajax request with data of user's details to store in users collection
             $.ajax({
                 type: "post",
                 url: "/registration",
                 data: data,
                 success: function (res) {
                     if (res.type == 'error') {
+                        //on error response of ajax request user redirect to login page
                         window.location.href = '/login';
                     }
                     else {
+                        //on success response of ajax request user redirect to timeline page
                         window.location.href = "/"
                     }
                 },

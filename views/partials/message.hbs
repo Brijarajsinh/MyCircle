@@ -1,38 +1,35 @@
 <div class="m-2">
-<div class="row container-fluid">
-    <div class="col-4">
-        <table class="table table-striped">
-            <tbody>
-                {{#each users}}
-                <tr>
-                    <td>
-                        <div class="avatar avatar-m" style="background-image: url(/images/user_images/{{profile}});">
-                        </div>
-                    </td>
-                    <td>
-                        <a href="javascript:void(0);" class="chatting" id="{{_id}}">{{fullName}}</a>
-                        <h1 class="badge bg-red" id="c{{_id}}" data-count="{{count}}">{{count}}</h1>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-8 bg-secondary chatbox" hidden>
-        <div style="height: 680px;" class="Message_content d-flex">
-
-            <div class="receiver w-50">
-
-            </div>
-
-            <div class="sender w-50">
-
-            </div>
+    <div class="row container-fluid">
+        <div class="col-4">
+            <table class="table table-striped">
+                <tbody>
+                    {{#each users}}
+                    <tr>
+                        <td>
+                            <div class="avatar avatar-m"
+                                style="background-image: url(/images/user_images/{{profile}});">
+                            </div>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0);" class="chatting" id="{{_id}}">{{fullName}}</a>
+                            <h1 class="badge bg-red" id="c-{{_id}}" data-count=""></h1>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-8 bg-secondary chatbox" hidden style="height: 680px;">
 
         </div>
-        <div class="row message" data-receiver="" id="{{user._id}}">
-            <input type="text" class="content" style="width:75%" placeholder="Type Message.....">
-            <input type="button" class="send" style="width:25%" value="Send">
+        <div class="row message pt-2" data-receiver="" id="{{user._id}}" hidden>
+            <div class="col-4">
+
+            </div>
+            <div class="col-8">
+                <input type="text" class="content" style="width:75%" placeholder="Type Message.....">
+                <input type="button" class="send pl-2" style="width:24%" value="Send">
+            </div>
         </div>
     </div>
 </div>

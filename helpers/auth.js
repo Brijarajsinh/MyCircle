@@ -8,6 +8,8 @@ const md5 = require('md5');
 const { log } = require('handlebars');
 
 module.exports = {
+
+  //user login function to store user information in browser cookies from database
   login: function (app) {
     app.use(cookieSession({
       secret: "session",
@@ -36,6 +38,8 @@ module.exports = {
       * @return {[type]}
       */
       function (req, email, pswd, done) {
+
+        //if user find than store user-details in browser cookie
         UserModel.findOne({
           'email': {
             $regex: '^' + email + '$',
@@ -71,7 +75,7 @@ module.exports = {
     ));
     passport.serializeUser(function (req, user, done) {
       console.log("serializeUser");
-      console.log(req.user);
+      //console.log(req.user);
       done(null, user);
     });
     passport.deserializeUser(function (req, user, done) {
@@ -84,6 +88,8 @@ module.exports = {
       }
     });
   },
+  //function checks user is authenticated or not 
+  // for purpose of restricting access other functionalities/routes without login
   commonMiddleware: function (req, res, next) {
     if (req.isAuthenticated()) {
       return next();

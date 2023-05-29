@@ -3,22 +3,23 @@
         <div class="card card-md">
             <div class="card-body">
                 <h2 class="h2 text-center mb-4">Register your new account</h2>
-                <form id="RegistrationForm">
+                <form id="registration-form">
                     <h2 class="card-title text-center mb-4">Create new account</h2><br>
                     <div class="mb-3">
                         <label class="form-label">First Name:-<sup class="text-danger">*(required)</sup></label><b>
 
                             <input type="text" class="form-control" placeholder="Enter Your First name" name="fname"
-                                id="rfname">
+                                id="register-fname">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Last Name:-<sup class="text-danger">*(required)</sup></label>
                         <input type="text" class="form-control" placeholder="Enter Your Last name" name="lname"
-                            id="rlname">
+                            id="register-lname">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email address:-<sup class="text-danger">*(required)</sup></label>
-                        <input type="email" class="form-control" placeholder="Enter email" name="email" id="email">
+                        <input type="email" class="form-control" placeholder="Enter email" name="email"
+                            id="register-email">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Gender:-<sup class="text-danger">*(required)</sup></label>
@@ -26,17 +27,17 @@
                         <label for="male">Male</label><br>
                         <input type="radio" id="female" name="gender" value="female">
                         <label for="female">Female</label><br />
-                        <label id="Gendererror"></label>
+                        <label id="gender-error"></label>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Password:-<sup class="text-danger">*(required)</sup></label>
-                        <input type="password" class="form-control" placeholder="Enter Password" name="pswd" id="pswd"
-                            minlength="8">
+                        <input type="password" class="form-control" placeholder="Enter Password" name="pswd"
+                            id="register-password" minlength="8">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Confirm Password:-<sup class="text-danger">*(required)</sup></label>
-                        <input type="password" class="form-control" placeholder="Confirm Password" name="cpswd"
-                            id="cpswd" minlength="8">
+                        <input type="password" class="form-control" placeholder="Confirm Password" name="confirm-pswd"
+                            id="confirm-pswd" minlength="8">
                     </div>
                     <div class="form-footer">
                         <button type="submit" id="btn-submit" class="btn btn-primary w-100" name="register">Create new
