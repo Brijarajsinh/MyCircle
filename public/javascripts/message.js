@@ -112,7 +112,6 @@ $(document).ready(function () {
             $(".content").val("");
         }
         //if message content is nothing than toastr that "type something"
-
         else {
             toastr.info("Please Type message...");
         }

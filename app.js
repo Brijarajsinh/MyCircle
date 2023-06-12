@@ -28,7 +28,7 @@ global.mongoose = require("mongoose");
 
 //connecting application with database by requiring connection.js file
 require('./connection')();
-var app = express();
+const app = express();
 
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
@@ -63,8 +63,8 @@ app.use((req, res, next) => {
   if (req.user) {
     res.locals.user = req.user;
   }
-  let error = req.flash("error");
-  let success = req.flash("success");
+  const error = req.flash("error");
+  const success = req.flash("success");
   if (success.length > 0) {
     res.locals.flash = {
       type: "success",

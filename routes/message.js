@@ -5,7 +5,7 @@ const { default: mongoose } = require('mongoose');
 const messagesModel = require('../schema/messagesSchema');
 
 
-//GET Route to get all messaged
+//GET Route to get all messaged of logged in user
 router.get('/:receiver/get', async function (req, res, next) {
     try {
         const senderID = new mongoose.Types.ObjectId(req.user._id);
@@ -202,4 +202,6 @@ router.get('/', async function (req, res, next) {
         );
     }
 });
+
+
 module.exports = router;
